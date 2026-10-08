@@ -52,7 +52,8 @@ Kök dizindeki eski GitHub Pages dosyaları (`index.html`, `sw.js`, `app.html`, 
 | `SESSION_SECRET` | dev: rastgele + uyarı; prod (`NODE_ENV=production`): **zorunlu**, yoksa çıkış 1 | çerez imzası |
 | `ADMIN_USER` / `ADMIN_PASSWORD` | — | Açılışta `users.json` boşsa bu admin oluşturulur ve loglanır ("admin oluşturuldu: <user>"); şifre loglanmaz |
 | `TZ` | Europe/Istanbul | tarih dizgileri için `Intl.DateTimeFormat('sv-SE',{timeZone})` kullan, `TZ`'ye güvenme |
-| `TRUST_PROXY` | prod: true | Railway edge arkasında IP için |
+| `TRUST_PROXY` | prod: true | Railway'de `true` (zincir iki atlamalı; `1`/`2` iç proxy IP'sini verir) |
+| `PUBLIC_URL` | — | Dış kök adres (`https://alan`), sihirli link üretimi için; prod'da verilir. Yoksa `X-Forwarded-Proto`'nun ilk girdisi + host |
 | `LOG_LEVEL` | info | |
 
 ## 3. Veri düzeni (`DATA_DIR`)

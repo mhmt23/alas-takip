@@ -58,14 +58,24 @@ Gereksinim: Railway hesabı (Hobby plan) ve Railway CLI (`npm i -g @railway/cli`
 4. **Variables.** Servis → Variables bölümüne ekle:
    - `SESSION_SECRET`: zorunlu. `.env.example` içindeki komutla üret.
    - `ADMIN_USER`, `ADMIN_PASSWORD`: ilk açılışta yönetici oluşturur. `users.json` doluyken yok sayılır.
-   - `TRUST_PROXY=1`: önerilir. Railway'in tek proxy katmanına güvenir; istemci sahte `X-Forwarded-For` göndererek giriş hız sınırını (15 dakikada 5 deneme) atlatamaz. Verilmezse prod varsayılanı `true` olur ve başlıktaki en soldaki adres güvenilir sayılır.
-   - `PORT` eklenmez; Railway verir. `NODE_ENV`, `TZ`, `DATA_DIR` Dockerfile'da tanımlı, değiştirilmez.
+   - `TRUST_PROXY=true`: Railway'in proxy zinciri iki atlamalı (kenar + iç). `1` veya `2` verildiğinde istemci IP'si yerine Railway'in iç adresi (100.64.x.x) görülür ve giriş hız sınırı (15 dakikada 5 deneme) herkesi tek kovada toplar. `true` ile gerçek istemci IP'si gelir (8 Ekim 2026'da canlıda doğrulandı).
+   - `PUBLIC_URL=https://<alan-adi>`: sihirli linkler bu kökle üretilir. Verilmezse `X-Forwarded-Proto` "https, http" geldiğinden link `http://` çıkabilir.
+   - `DATA_DIR=/data` Dockerfile'da tanımlı; Variables'a yazmak gerekmez. **Git Bash'ten yazarsanız** `MSYS_NO_PATHCONV=1` olmadan `/data` değeri `C:/Program Files/Git/data`'ya çevrilir ve uygulama Volume yerine geçici diske yazar (veri her deploy'da kaybolur — 8 Ekim 2026'da yaşandı; log satırı `dataDir="/app/C:/Program Files/Git/data"`).
+   - `PORT` eklenmez; Railway verir. `NODE_ENV`, `TZ` Dockerfile'da tanımlı.
+
+   **Windows notu:** Railway CLI'ı Git Bash'ten kullanırken her komutun başına `MSYS_NO_PATHCONV=1` koy (ör. `MSYS_NO_PATHCONV=1 railway variables --set DATA_DIR=/data`). PowerShell'de bu sorun yok. CLI 4.5.3'te `railway volume add` çöküyor (`Option::unwrap() on a None value`); Volume'u Railway panelinden ekle.
 
 5. **Alan adı.** Settings → Networking: önce **Generate Domain** (`*.up.railway.app`) ile test et. Özel alan adı için **Custom Domain** ekle ve Railway'in istediği CNAME/TXT kayıtlarını DNS'e gir. Sertifika birkaç dakika sürebilir.
 
 6. **Doğrula.** `https://<alan-adi>/health` çağrısında `"ok":true` ve `"dataWritable":true` görülmeli. Sonra `https://<alan-adi>/` giriş sayfasını aç.
 
-7. **Veriyi yükle.** Yerel `data/` klasörünü canlıya göndermek için `tools/yukle-data.mjs` kullanılır (`PUT /api/admin/file`, yalnız yönetici). Adres ve giriş yöntemi için betiğin başındaki açıklamaya bak. Yönetici şifresini komut satırına yazma.
+7. **Veriyi yükle.** Yerel `data/` klasörünü canlıya göndermek için `tools/yukle-data.mjs` kullanılır (`PUT /api/admin/file`, yalnız yönetici). Şifre `ALAS_ADMIN_PASSWORD` ortam değişkeninden okunur, komut satırına yazılmaz:
+   ```
+   node tools/yukle-data.mjs --url https://<alan-adi> --user admin --data data
+   ```
+   Yükledikten sonra kalıcılığı sına: `railway redeploy -s <servis> -y` → `/health` içinde `lastPhotoDay` korunmalı. Sıfırlanıyorsa `DATA_DIR` yanlıştır (yukarıdaki Git Bash notu).
+
+8. **Sihirli link üret.** Yönetici oturumuyla `POST /api/admin/magic-link` (`{"label":"patron","days":7,"maxDevices":3}`) → dönen `url` telefona gönderilir; Safari/Chrome'da açılır, "Ana Ekrana Ekle" yapılır.
 
 **Deploy saati kuralı:** Volume'lu serviste her deploy 20–60 sn kesinti yapar. 07:00–08:00 ve 18:00–19:00 arasında deploy yapma.
 
@@ -75,6 +85,7 @@ Gereksinim: Railway hesabı (Hobby plan) ve Railway CLI (`npm i -g @railway/cli`
 
 1. **Konteyner açılıp hemen kapanıyor, logda `SESSION_SECRET` yazıyor.** Variables'a `SESSION_SECRET` eklenmemiş. Production'da zorunludur; yoksa uygulama kod 1 ile çıkar.
 2. **`/health` içinde `"dataWritable":false`.** Volume bağlı değil ya da mount yolu `/data` değil. Volume ayarını kontrol edip yeniden deploy et.
+   **`dataWritable:true` ama her deploy'da veri sıfırlanıyor.** `railway logs` içinde `dataDir=` satırına bak; `/data` değilse Variables'taki `DATA_DIR` bozuk (Git Bash yol çevirimi). Değişkeni sil ya da `MSYS_NO_PATHCONV=1` ile `/data` yaz.
 3. **Pano "Pano verisi alınamadı" diyor.** `401` ise oturum yok; giriş yap. `500` veya `404` ise `data/main/` eksik; yerelde `npm run migrate` çalıştır, canlıda veriyi yükle.
 4. **Build hatası (`npm ci`).** `package-lock.json` ile `package.json` uyuşmuyor. Yerelde `npm install` ile kilit dosyasını yenile ve commit et.
 5. **Giriş olmuyor.** Şifreyi ve kullanıcı adını kontrol et; 15 dakikada 5 denemeden sonra giriş geçici olarak kapanır (429). Sihirli link "Bu bağlantıyı Safari/Chrome'da açın" diyorsa link WhatsApp veya Instagram içinde açılmıştır; linki tarayıcıda aç. Link süresi dolduysa yönetici yeni link üretmeli.
