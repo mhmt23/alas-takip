@@ -1,0 +1,20 @@
+# Bağımlılıklar ve yerel çıktılar — imaja girmez (npm ci konteyner içinde yeniden kurulur)
+node_modules
+npm-debug.log*
+
+# Kalıcı veri ve çözülmüş içerik — veri Railway Volume'unda (/data) yaşar, imaja asla girmez
+data
+_acik
+ornek
+d
+plan-ekleri
+
+# Eski GitHub Pages dosyaları ve yardımcı belgeler
+check.enc
+*.md
+.git
+.claude
+
+# Gizli değerler: .env yalnızca yerelde kullanılır, imaja girmemeli
+.env
+.env.*

@@ -1,0 +1,599 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#2b5d8c"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Alas Takip"><style>body{margin:0;font:14px system-ui;background:#f7f7f5}img{max-width:100%}[hidden]{display:none!important}</style><title>Alas Takip</title></head><body>
+<link rel="stylesheet" href="/fonts/fonts.css">
+<style>
+/* Layout: summary first (verdict + latest frame), then this week's work, phases, timeline, photos.
+   Palette: galvanized-steel neutrals with a steel-blue accent; status colors reserved for schedule state. */
+:root{
+  --bg:#f3f4f6; --surface:#ffffff; --surface-2:#e9ecf0; --line:#d5d9e0; --line-strong:#b9bfc9;
+  --fg:#15202b; --fg-2:#4b5563; --fg-3:#7a8494;
+  --accent:#2b5d8c; --accent-soft:#d9e6f2; --accent-ink:#1d4668;
+  --good:#1a8f3c; --good-soft:#dcf1e2; --warn:#c7780a; --warn-soft:#fbe9cc; --crit:#c73a3a; --crit-soft:#f8dcdc;
+  --plan:#9aa6b6; --plan-soft:#e3e7ed;
+  --font-display:"Barlow Condensed","Arial Narrow","Roboto Condensed",system-ui,sans-serif;
+  --font-body:"Barlow","Segoe UI",system-ui,-apple-system,sans-serif;
+  --radius:6px; --shadow:0 1px 2px rgba(21,32,43,.08);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#12161b; --surface:#1b2129; --surface-2:#232b35; --line:#2f3844; --line-strong:#46515f;
+  --fg:#eef1f4; --fg-2:#b6bfca; --fg-3:#7f8a98;
+  --accent:#6fa3d6; --accent-soft:#213446; --accent-ink:#9cc3e6;
+  --good:#3fbf67; --good-soft:#193323; --warn:#e3a033; --warn-soft:#3a2c14; --crit:#e46262; --crit-soft:#3d1c1c;
+  --plan:#6b7786; --plan-soft:#2b333d; --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#12161b; --surface:#1b2129; --surface-2:#232b35; --line:#2f3844; --line-strong:#46515f;
+  --fg:#eef1f4; --fg-2:#b6bfca; --fg-3:#7f8a98;
+  --accent:#6fa3d6; --accent-soft:#213446; --accent-ink:#9cc3e6;
+  --good:#3fbf67; --good-soft:#193323; --warn:#e3a033; --warn-soft:#3a2c14; --crit:#e46262; --crit-soft:#3d1c1c;
+  --plan:#6b7786; --plan-soft:#2b333d; --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.45;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:14px 48px}
+h1,h2,h3{font-family:var(--font-display);line-height:1.05;margin:0;text-wrap:balance}
+h1{font-size:clamp(28px,4.2vw,40px);font-weight:700;letter-spacing:.01em;text-transform:uppercase}
+h2{font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+h3{font-size:18px;font-weight:600}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3)}
+.muted{color:var(--fg-3)} .small{font-size:13px}
+.num{font-variant-numeric:tabular-nums}
+a{color:var(--accent-ink)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 20px;padding-bottom:12px;border-bottom:2px solid var(--fg)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border:1px solid var(--line-strong);border-radius:999px;font-size:12.5px;background:var(--surface);white-space:nowrap}
+.chip b{font-weight:600}
+
+section{margin-top:26px}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px;margin-bottom:10px}
+
+/* verdict */
+.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px;margin-top:16px}
+@media (max-width:760px){.hero{grid-template-columns:1fr}}
+.verdict{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--plan);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px}
+.verdict.good{border-left-color:var(--good)} .verdict.warn{border-left-color:var(--warn)} .verdict.crit{border-left-color:var(--crit)}
+.verdict .big{font-family:var(--font-display);font-size:clamp(34px,5vw,52px);font-weight:700;line-height:1;text-transform:uppercase}
+.verdict.good .big{color:var(--good)} .verdict.warn .big{color:var(--warn)} .verdict.crit .big{color:var(--crit)}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:420px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{border-top:1px solid var(--line);padding-top:8px}
+.kpi .v{font-family:var(--font-display);font-size:28px;font-weight:600;line-height:1}
+.kpi .l{font-size:12.5px;color:var(--fg-3);margin-top:3px}
+.dualbar{position:relative;height:14px;background:var(--plan-soft);border-radius:3px;overflow:hidden}
+.dualbar .p{position:absolute;inset:0 auto 0 0;background:var(--plan)}
+.dualbar .a{position:absolute;left:0;top:3px;bottom:3px;background:var(--accent)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--fg-2)}
+.legend i{display:inline-block;width:14px;height:8px;border-radius:2px;vertical-align:middle;margin-right:5px}
+.latest{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;min-width:0}
+.latest .img{position:relative;background:var(--surface-2);aspect-ratio:4/3;max-width:100%}
+.latest img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+.latest .cap{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 14px;font-size:13.5px}
+
+/* task lists */
+.tasklist{display:flex;flex-direction:column;gap:8px}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;align-items:center;cursor:pointer}
+.task:hover{border-color:var(--line-strong)}
+.task .name{font-weight:500}
+.task .meta{font-size:12.5px;color:var(--fg-3);display:flex;flex-wrap:wrap;gap:4px 12px}
+.task .bars{grid-column:1/-1}
+.status{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.status::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.status.good{background:var(--good-soft);color:var(--good)}
+.status.warn{background:var(--warn-soft);color:var(--warn)}
+.status.crit{background:var(--crit-soft);color:var(--crit)}
+.status.plan{background:var(--plan-soft);color:var(--fg-2)}
+.status.done{background:var(--good-soft);color:var(--good)}
+.pcts{display:flex;justify-content:space-between;font-size:12.5px;color:var(--fg-2);margin-top:4px}
+.empty{padding:14px;border:1px dashed var(--line-strong);border-radius:var(--radius);color:var(--fg-3)}
+
+/* phases */
+.phases{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.phase{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;display:flex;flex-direction:column;gap:8px;cursor:pointer}
+.phase:hover{border-color:var(--line-strong)}
+.phase .t{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.phase .t h3{font-size:17px}
+.phase .dates{font-size:12.5px;color:var(--fg-3)}
+
+/* gantt */
+.gantt-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.gantt-tools{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13.5px}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:4px 12px;cursor:pointer;font-size:13px}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.gantt{overflow-x:auto;overflow-y:auto;max-height:70vh;position:relative}
+.g-grid{display:grid;grid-template-columns:230px 1fr;min-width:max-content}
+.g-head{position:sticky;top:0;z-index:3;background:var(--surface);border-bottom:1px solid var(--line-strong);display:contents}
+.g-head > div{position:sticky;top:0;background:var(--surface);z-index:3;border-bottom:1px solid var(--line-strong)}
+.g-head .g-name{z-index:4}
+.g-name{position:sticky;left:0;background:var(--surface);z-index:2;border-right:1px solid var(--line-strong);padding:0 10px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:26px;line-height:26px}
+.g-name.sum{font-weight:600;font-family:var(--font-display);font-size:14.5px;text-transform:uppercase;letter-spacing:.02em}
+.g-name.lvl2{padding-left:18px}
+.g-row{position:relative;height:26px;border-bottom:1px solid var(--line)}
+.g-row.sum{background:var(--surface-2)}
+.g-row:hover,.g-name:hover{background:var(--accent-soft)}
+.g-rows{display:contents}
+.months{display:flex;height:22px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.months div{border-left:1px solid var(--line-strong);padding-left:6px;line-height:22px;white-space:nowrap;overflow:hidden}
+.daysrow{display:flex;height:20px;font-size:10.5px;color:var(--fg-3)}
+.daysrow div{text-align:center;line-height:20px;border-left:1px solid var(--line)}
+.daysrow div.we{background:var(--surface-2)}
+.bar{position:absolute;top:7px;height:12px;border-radius:3px;background:var(--plan);overflow:hidden}
+.bar .fill{position:absolute;inset:0 auto 0 0;background:var(--accent)}
+.bar.good .fill{background:var(--good)} .bar.warn .fill{background:var(--warn)} .bar.crit .fill{background:var(--crit)} .bar.done{background:var(--good)}
+.bar.sumbar{top:9px;height:8px;border-radius:2px;background:var(--fg-3)}
+.bar.sumbar .fill{background:var(--fg)}
+.ms{position:absolute;top:8px;width:10px;height:10px;transform:rotate(45deg);background:var(--fg);border-radius:1px}
+.ms.done{background:var(--good)}
+.today{position:absolute;top:0;bottom:0;width:2px;background:var(--crit);z-index:1;pointer-events:none}
+.today-lbl{position:absolute;top:0;font-size:10px;font-weight:700;color:var(--crit);background:var(--surface);padding:0 3px;transform:translateX(-50%);z-index:4}
+.g-row .pct{position:absolute;right:6px;top:0;line-height:26px;font-size:11px;color:var(--fg-3)}
+.gantt-legend{padding:8px 14px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--fg-2)}
+
+/* photos */
+.filterbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px;padding:8px 12px;background:var(--accent-soft);border-radius:var(--radius);font-size:13.5px}
+.filterbar button{border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:3px 10px;cursor:pointer;font-size:13px}
+.daylist{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.day{flex:0 0 auto;border:1px solid var(--line-strong);background:var(--surface);border-radius:var(--radius);padding:6px 10px;cursor:pointer;text-align:left;min-width:92px}
+.day[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.day .d{font-family:var(--font-display);font-size:19px;font-weight:600;line-height:1}
+.day .n{font-size:11.5px;opacity:.8;margin-top:3px}
+.sessions{display:flex;flex-direction:column;gap:16px;margin-top:12px}
+.session .sh{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin-bottom:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+@media (max-width:480px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ph{position:relative;aspect-ratio:4/3;max-width:100%;background:var(--surface-2);border-radius:4px;overflow:hidden;border:0;padding:0;cursor:zoom-in}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph span{position:absolute;left:6px;bottom:5px;background:rgba(0,0,0,.55);color:#fff;font-size:11.5px;padding:1px 6px;border-radius:3px}
+.compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+@media (max-width:560px){.compare{grid-template-columns:1fr}}
+.cmp select{font:inherit;width:100%;padding:6px 8px;border:1px solid var(--line-strong);border-radius:var(--radius);background:var(--surface);color:var(--fg);margin-bottom:6px}
+.cmp .ph{aspect-ratio:4/3}
+
+/* lightbox */
+.lb{position:fixed;inset:0;background:rgba(5,8,12,.94);z-index:50;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.lb .img{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px}
+.lb img{max-width:100%;max-height:100%;object-fit:contain}
+.lb .bar{position:static;height:auto;border-radius:0;background:transparent;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;color:#fff;font-size:14px;overflow:visible}
+.lb button{border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:6px 14px;cursor:pointer}
+.lb .nav{display:flex;gap:8px}
+
+.banner{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn);border-radius:var(--radius);padding:8px 12px;font-weight:600;margin-bottom:12px;font-size:14px}
+.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+.rep{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.rep .col{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;min-width:0}
+.rep .col h3{display:flex;align-items:center;gap:8px;font-size:16px;margin-bottom:6px}
+.rep ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.rep li small{color:var(--fg-3)}
+.rep .why{color:var(--crit);font-weight:600}
+.repbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:10px}
+.repbar select{font:inherit;padding:4px 8px;border:1px solid var(--line-strong);border-radius:var(--radius);background:var(--surface);color:var(--fg)}
+.slips{display:flex;flex-direction:column;gap:6px}
+.slip{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:9px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;cursor:pointer}
+.slip .d{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--crit);white-space:nowrap}
+.slip .d small{font-family:var(--font-body);font-size:12px;font-weight:500;color:var(--fg-3)}
+.slip .r{grid-column:1/-1;font-size:13px;color:var(--fg-2)}
+.reasons{display:grid;grid-template-columns:max-content 1fr max-content;gap:6px 10px;align-items:center;font-size:13.5px;margin-top:10px}
+.reasons .b{height:10px;background:var(--crit);border-radius:3px;opacity:.85}
+.bl{position:absolute;top:21px;height:3px;background:var(--plan);border-radius:2px}
+.crewrow{display:grid;grid-template-columns:max-content 1fr max-content;gap:6px 10px;align-items:center;font-size:13.5px}
+.crewrow .bars{position:relative;height:12px;background:var(--plan-soft);border-radius:3px;overflow:hidden}
+.crewrow .bars .p{position:absolute;inset:0 auto 0 0;background:var(--plan)}.crewrow .bars .a{position:absolute;left:0;top:2px;bottom:2px;background:var(--accent)}
+.people{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.people .col{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;min-width:0}
+.hist{display:grid;grid-template-columns:max-content 1fr max-content;gap:5px 10px;align-items:center;font-size:13px}
+.hist .b{position:relative;height:14px;background:var(--plan-soft);border-radius:3px;overflow:hidden}.hist .b .p{position:absolute;inset:0 auto 0 0;background:var(--plan)}.hist .b .a{position:absolute;left:0;top:3px;bottom:3px;background:var(--accent)}
+.replist{display:flex;flex-wrap:wrap;gap:6px}.replist a{display:inline-flex;gap:6px;align-items:center;padding:4px 10px;border:1px solid var(--line-strong);border-radius:999px;font-size:13px;text-decoration:none;color:var(--fg);background:var(--surface)}
+.replist a b{font-family:var(--font-display);font-size:15px}
+.video{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-top:14px}
+.video video{display:block;width:100%;max-height:70vh;background:#000}
+.video .cap{padding:8px 14px;font-size:13.5px}
+footer{margin-top:36px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--fg-3);display:flex;flex-direction:column;gap:4px}
+@media (prefers-reduced-motion:no-preference){.bar .fill,.dualbar .a,.dualbar .p{transition:width .4s ease}}
+</style>
+
+<div class="wrap">
+  <div class="banner" id="banner" hidden></div>
+  <header class="top">
+    <div>
+      <div class="eyebrow" id="place">Alas Takip · Kuşçular, Urla / İzmir</div>
+      <h1 id="title">338 Ada Depo / Restoran</h1>
+    </div>
+    <div class="chips" id="chips"></div>
+  </header>
+
+  <div class="hero">
+    <div class="verdict" id="verdict"></div>
+    <div class="latest" id="latest"></div>
+  </div>
+
+  <section>
+    <div class="sec-head"><h2>Günlük rapor</h2><span class="muted small">Şantiye şefinin akşam girdiği rapor: yapılanlar, yapılmayanlar ve sebepleri.</span></div>
+    <div class="repbar" id="repbar"></div>
+    <div id="report"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Personel</h2><span class="muted small">Gelen kişi (mavi) ve programda planlanan kişi (gri), günlük raporlardan.</span></div>
+    <div class="people" id="people"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Bu hafta sahada</h2><span class="muted small">Bugün devam eden ve 7 gün içinde başlayacak işler. Satıra tıklayınca o işin dönemine ait çekimler açılır.</span></div>
+    <div class="tasklist" id="week"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Aşamalar</h2><span class="muted small">Gri: bugün itibarıyla planlanan. Mavi: MS Project'e girilen gerçekleşme.</span></div>
+    <div class="phases" id="phases"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Geciken işler ve sebepleri</h2><span class="muted small">Temel plana göre bitiş tarihi kayan açık işler. Sebepler günlük raporlardan.</span></div>
+    <div class="slips" id="slips"></div>
+    <div id="reasons"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Zaman çizelgesi</h2><span class="muted small">Kırmızı çizgi bugün. Çubuğun dolu kısmı gerçekleşme.</span></div>
+    <div class="gantt-wrap">
+      <div class="gantt-tools">
+        <span class="seg" role="group" aria-label="Görünüm">
+          <button type="button" id="gv-near" aria-pressed="true">Yakın işler</button>
+          <button type="button" id="gv-all" aria-pressed="false">Tüm program</button>
+        </span>
+        <span class="muted" id="gantt-count"></span>
+      </div>
+      <div class="gantt" id="gantt"></div>
+      <div class="gantt-legend">
+        <span><i class="status good"></i> Programda</span><span><i class="status warn"></i> Geride</span><span><i class="status crit"></i> Gecikmiş</span><span>◆ Kilometre taşı</span><span>▬ ince gri çizgi: temel plan</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="photos-sec">
+    <div class="sec-head"><h2>Drone çekimleri</h2><span class="muted small" id="photo-summary"></span></div>
+    <div class="filterbar" id="filterbar" hidden></div>
+    <div class="daylist" id="daylist"></div>
+    <div class="sessions" id="sessions"></div>
+    <div class="video" id="video" hidden></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Önce / sonra</h2><span class="muted small">İki günü yan yana karşılaştırın. Her günün ilk seansının ilk karesi gösterilir.</span></div>
+    <div class="compare">
+      <div class="cmp"><select id="cmpA" aria-label="Sol gün"></select><button class="ph" id="cmpAimg" type="button"></button></div>
+      <div class="cmp"><select id="cmpB" aria-label="Sağ gün"></select><button class="ph" id="cmpBimg" type="button"></button></div>
+    </div>
+  </section>
+
+  <footer id="foot"></footer>
+</div>
+
+<div class="lb" id="lb" hidden>
+  <div class="bar"><span id="lb-cap"></span><div class="nav"><button type="button" id="lb-prev">◀ Önceki</button><button type="button" id="lb-next">Sonraki ▶</button><button type="button" id="lb-close">Kapat ✕</button></div></div>
+  <div class="img"><img id="lb-img" alt=""></div>
+</div>
+
+<script>
+(async function(){
+  const q=new URLSearchParams(location.search);
+  let r=null; try{ r=await fetch("/api/pano.json"+(q.get("dataset")?"?dataset="+encodeURIComponent(q.get("dataset")):""),{credentials:"same-origin",cache:"no-store"}); }catch(e){ r=null; }
+  if(r&&r.status===401){location.replace("/?next="+encodeURIComponent(location.pathname+location.search));return;}
+  if(!r||!r.ok){document.body.innerHTML='<p style="padding:24px;font:16px system-ui">Pano verisi alınamadı ('+(r?r.status:"ağ yok")+'). Sayfayı yenileyin.</p>';return;}
+  const D=await r.json();
+  if("serviceWorker" in navigator){ navigator.serviceWorker.register("/sw.js").catch(function(){}); }
+  const MS = 86400000;
+  const AY = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+  const AYK = ["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
+  const GUN = ["Pz","Pt","Sa","Ça","Pe","Cu","Ct"];
+  const pd = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
+  const fmt = d => `${d.getDate()} ${AY[d.getMonth()]}`;
+  const fmtY = d => `${d.getDate()} ${AY[d.getMonth()]} ${d.getFullYear()}`;
+  const fmtS = d => `${d.getDate()}.${String(d.getMonth()+1).padStart(2,"0")}`;
+  const dayDiff = (a,b) => Math.round((a-b)/MS);
+  const clamp = (x,a,b) => Math.max(a, Math.min(b, x));
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+  const today = pd(D.generated.slice(0,10));
+  const pStart = pd(D.project.projectStart || "2026-10-01"), pFinish = pd(D.project.projectFinish || "2027-01-03");
+  const handover = pd(D.project.handover || "2026-12-01");
+
+  // ---- schedule maths
+  const tasks = D.tasks.map(t => ({...t, s: pd(t.start), f: pd(t.finish), bs: t.bStart ? pd(t.bStart) : null, bf: t.bFinish ? pd(t.bFinish) : null}));
+  const logs = (D.logs||[]).slice().sort((a,b)=>a.date<b.date?-1:1);
+  const leaves = tasks.filter(t => !t.summary);
+  function plannedAt(t, d){            // fraction planned complete at END of day d
+    const s = t.bs || t.s, f = t.bf || t.f;   // planlanan = temel plan (baseline), yoksa güncel program
+    if (d < s) return 0;
+    if (d >= f) return 1;
+    return clamp((dayDiff(d, s) + 1) / (dayDiff(f, s) + 1), 0, 1);
+  }
+  const weight = t => t.dur > 0 ? t.dur : 0;
+  function aggregate(list, d){
+    let w=0, p=0, a=0;
+    for (const t of list){ const x = weight(t); if(!x) continue; w+=x; p+=x*plannedAt(t,d); a+=x*t.pct/100; }
+    return w ? {planned:p/w, actual:a/w, w} : {planned:0, actual:0, w:0};
+  }
+  function statusOf(t, d){
+    if (t.pct >= 100) return {k:"done", l:"Tamamlandı"};
+    const p = plannedAt(t, d);
+    if (p === 0) return {k:"plan", l: dayDiff(t.s, d) <= 7 ? "Başlayacak" : "Planlandı"};
+    if (t.pct/100 >= p - 1e-9) return {k:"good", l:"Programda"};
+    if (d > t.f || p - t.pct/100 > 0.5) return {k:"crit", l:"Gecikmiş"};
+    return {k:"warn", l:"Geride"};
+  }
+  // children of a summary (by outline level)
+  function childrenOf(sum){
+    const i = tasks.indexOf(sum), out=[];
+    for (let j=i+1;j<tasks.length;j++){ if (tasks[j].level <= sum.level) break; if(!tasks[j].summary) out.push(tasks[j]); }
+    return out;
+  }
+  const scope = leaves.filter(t => t.f <= handover);          // ileri kaba teslim kapsamı
+  const tot = aggregate(scope, today);
+  // schedule variance: date at which planned == actual
+  let varDays = 0;
+  { let d = new Date(pStart); let found = null;
+    for (; d <= pFinish; d = new Date(d.getTime()+MS)){ if (aggregate(scope, d).planned >= tot.actual - 1e-9){ found = d; break; } }
+    if (!found) found = pFinish;
+    varDays = dayDiff(found, today); // negative = behind
+  }
+  const verdictK = !tot.w ? "plan" : (varDays >= -1 ? "good" : (varDays >= -5 ? "warn" : "crit"));
+  const verdictT = !tot.w ? "Veri yok" : (varDays >= -1 ? (varDays > 1 ? `${varDays} gün önde` : "Programa uygun") : `${-varDays} gün geride`);
+
+  // ---- photos index
+  const days = (D.days||[]).slice().sort((a,b)=>a.date<b.date?-1:1);
+  const allPhotos = []; days.forEach(d => d.sessions.forEach(s => s.photos.forEach(p => allPhotos.push({...p, date:d.date, sid:s.id}))));
+  const lastPhoto = allPhotos[allPhotos.length-1];
+
+  if (D.banner){ const b = document.getElementById("banner"); b.hidden = false; b.textContent = D.banner; }
+
+  // ---- header chips
+  const chips = [];
+  chips.push(`<span class="chip">Bugün <b>${fmtY(today)}</b></span>`);
+  chips.push(`<span class="chip">Program <b>${esc(D.project.source||"")}</b></span>`);
+  if (D.project.statusDate) chips.push(`<span class="chip">Gerçekleşme durumu <b>${fmtS(pd(D.project.statusDate))}</b></span>`);
+  chips.push(`<span class="chip">Son çekim <b>${lastPhoto ? fmtS(pd(lastPhoto.date))+" "+lastPhoto.t : "—"}</b></span>`);
+  document.getElementById("chips").innerHTML = chips.join("");
+
+  // ---- verdict
+  const kalan = dayDiff(handover, today);
+  const fc = D.project.forecastHandover ? pd(D.project.forecastHandover) : null;
+  const fcSlip = fc ? dayDiff(fc, handover) : 0;
+  const fcHtml = fc ? `<div class="kpi"><div class="v num" style="color:${fcSlip>0?'var(--crit)':'var(--good)'}">${fmtS(fc)}</div><div class="l">tahmini teslim (MS Project)${fcSlip?` · ${fcSlip>0?'+':''}${fcSlip} gün`:''}</div></div>` : "";
+  const active = scope.filter(t => t.pct < 100 && t.s <= today && t.f >= today).length;
+  const late = scope.filter(t => ["warn","crit"].includes(statusOf(t,today).k)).length;
+  document.getElementById("verdict").className = "verdict " + verdictK;
+  document.getElementById("verdict").innerHTML = `
+    <div><div class="eyebrow">İleri kaba teslim (${fmt(handover)}) hedefine göre</div><div class="big">${esc(verdictT)}</div></div>
+    <div>
+      <div class="dualbar" aria-hidden="true"><div class="p" style="width:${(tot.planned*100).toFixed(1)}%"></div><div class="a" style="width:${(tot.actual*100).toFixed(1)}%"></div></div>
+      <div class="pcts num"><span>Gerçekleşen <b>%${Math.round(tot.actual*100)}</b></span><span>Planlanan <b>%${Math.round(tot.planned*100)}</b></span></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="v num">${kalan}</div><div class="l">gün kaldı (1 Aralık)</div></div>
+      ${fcHtml}
+      <div class="kpi"><div class="v num">${active}</div><div class="l">iş bugün devam ediyor</div></div>
+      <div class="kpi"><div class="v num" style="color:${late?'var(--crit)':'inherit'}">${late}</div><div class="l">iş programın gerisinde</div></div>
+    </div>
+    <div class="legend"><span><i style="background:var(--plan)"></i>Planlanan (${D.project.baseline?'temel plan':'program'} tarihleri, süre ağırlıklı)</span><span><i style="background:var(--accent)"></i>Gerçekleşen (MS Project)</span></div>`;
+
+  // ---- latest frame
+  const latest = document.getElementById("latest");
+  if (lastPhoto){
+    latest.innerHTML = `<div class="img"><img src="${lastPhoto.src}" alt="Son drone görüntüsü" loading="eager"></div>
+      <div class="cap"><span><b>Son görüntü</b> · ${fmtY(pd(lastPhoto.date))} ${lastPhoto.t}</span><span class="muted">${lastPhoto.alt!=null?lastPhoto.alt.toFixed(0)+" m irtifa":""}</span></div>`;
+    latest.querySelector("img").addEventListener("click", () => openLb(allPhotos.length-1));
+  } else latest.innerHTML = `<div class="img"></div><div class="cap">Henüz çekim yok</div>`;
+
+  // ---- task card
+  function taskCard(t){
+    const st = statusOf(t, today), p = plannedAt(t, today);
+    return `<div class="task" role="button" tabindex="0" data-id="${t.id}">
+      <div><div class="name">${esc(t.name.trim())}</div>
+        <div class="meta"><span>${fmt(t.s)}${t.dur>0?" – "+fmt(t.f):""}</span>${t.dur>0?`<span>${t.dur} gün</span>`:""}${t.crew?`<span>${esc(t.crew)}</span>`:""}${t.qty?`<span>${esc(t.qty)}</span>`:""}${t.deadline?`<span style="color:var(--crit)">Taahhüt ${fmt(pd(t.deadline))}</span>`:""}</div></div>
+      <span class="status ${st.k}">${st.l}</span>
+      ${t.dur>0?`<div class="bars"><div class="dualbar" aria-hidden="true"><div class="p" style="width:${(p*100).toFixed(0)}%"></div><div class="a" style="width:${t.pct}%"></div></div>
+      <div class="pcts num"><span>Gerçekleşen %${t.pct}</span><span>Planlanan %${Math.round(p*100)}</span></div></div>`:""}
+    </div>`;
+  }
+  const week = leaves.filter(t => t.pct < 100 && t.f >= new Date(today.getTime()-2*MS) && t.s <= new Date(today.getTime()+7*MS))
+                     .sort((a,b)=>a.s-b.s);
+  document.getElementById("week").innerHTML = week.length ? week.map(taskCard).join("") : `<div class="empty">Bu hafta için planlanmış açık iş yok.</div>`;
+
+  // ---- phases
+  const phases = tasks.filter(t => t.summary && t.level === 1);
+  document.getElementById("phases").innerHTML = phases.map(ph => {
+    const ch = childrenOf(ph), ag = aggregate(ch, today);
+    let k = "plan", l = "Planlandı";
+    if (ag.actual >= 0.999) { k="done"; l="Tamamlandı"; }
+    else if (ag.planned > 0) { const gap = ag.planned - ag.actual; k = gap <= 0.02 ? "good" : (gap > 0.25 ? "crit" : "warn"); l = k==="good" ? "Programda" : (k==="crit" ? "Gecikmiş" : "Geride"); }
+    return `<div class="phase" role="button" tabindex="0" data-id="${ph.id}">
+      <div class="t"><h3>${esc(ph.name.trim())}</h3><span class="status ${k}">${l}</span></div>
+      <div class="dates">${fmt(ph.s)} – ${fmt(ph.f)} · ${ch.length} iş</div>
+      <div class="dualbar" aria-hidden="true"><div class="p" style="width:${(ag.planned*100).toFixed(0)}%"></div><div class="a" style="width:${(ag.actual*100).toFixed(0)}%"></div></div>
+      <div class="pcts num"><span>Gerçekleşen %${Math.round(ag.actual*100)}</span><span>Planlanan %${Math.round(ag.planned*100)}</span></div></div>`;
+  }).join("");
+
+  // ---- günlük rapor
+  function renderReport(idx){
+    const L = logs[idx]; const el = document.getElementById("report"), bar = document.getElementById("repbar");
+    if (!L){ bar.innerHTML = ""; el.innerHTML = `<div class="empty">Henüz günlük rapor girilmemiş.</div>`; return; }
+    bar.innerHTML = `<select id="repsel" aria-label="Rapor günü">${logs.map((l,i)=>`<option value="${i}" ${i===idx?'selected':''}>${fmtY(pd(l.date))}</option>`).join("")}</select>` +
+      (L.weather?`<span class="chip">Hava <b>${esc(L.weather)}</b></span>`:"") + `<span class="muted small">kayıt ${esc((L.saved||"").replace("T"," "))}</span>`;
+    document.getElementById("repsel").onchange = e => renderReport(+e.target.value);
+    const done = L.entries.filter(e=>e.status==="done"), part = L.entries.filter(e=>e.status==="partial"), nd = L.entries.filter(e=>e.status==="notdone");
+    const li = e => `<li>${esc(e.name)}${e.status==="partial"?` <small>%${e.pct}</small>`:""}${e.status==="notdone"&&e.reason?` <span class="why">${esc(e.reason)}</span>`:""}${e.note?` <small>${esc(e.note)}</small>`:""}</li>`;
+    const crews = L.crews||{}, mach = L.machines||{}, plan = (D.crewPlan||{})[L.date]||{};
+    const gelen = Object.values(crews).reduce((a,b)=>a+b,0), planlanan = Object.values(plan).reduce((a,b)=>a+b,0);
+    const trades = [...new Set([...Object.keys(crews), ...Object.keys(plan)])].sort((a,b)=>(crews[b]||0)-(crews[a]||0));
+    const mx = Math.max(1, ...trades.map(t=>Math.max(crews[t]||0, plan[t]||0)));
+    const rep = (D.reports||[]).find(r=>r.date===L.date);
+    const li2 = e => `<li>${esc(e.name)}${e.status==="partial"?` <small>%${e.pct}</small>`:""}${e.people?` <small>· ${e.people} kişi</small>`:""}${e.status==="notdone"&&e.reason?` <span class="why">${esc(e.reason)}</span>`:""}${e.note?` <small>${esc(e.note)}</small>`:""}</li>`;
+    el.innerHTML = `<div class="rep" style="margin-bottom:10px">
+      <div class="col"><h3><span class="status ${gelen>=planlanan?'good':'warn'}">${gelen}</span> kişi çalıştı <small class="muted">· planlanan ${planlanan}</small></h3>
+        <div class="crewrow">${trades.map(t=>`<span>${esc(t)}</span><div class="bars"><div class="p" style="width:${(plan[t]||0)/mx*100}%"></div><div class="a" style="width:${(crews[t]||0)/mx*100}%"></div></div><span class="num">${crews[t]||0}${plan[t]?` / ${plan[t]}`:""}</span>`).join("")||`<span class="muted small">Personel girilmemiş</span>`}</div>
+        ${Object.keys(mach).length?`<div class="small" style="margin-top:8px"><b>Makine:</b> ${Object.entries(mach).map(([k,v])=>`${esc(k)} × ${v}`).join(", ")}</div>`:""}
+        ${rep?`<div style="margin-top:10px" class="replist"><a href="${rep.url}" target="_blank" rel="noopener">Günlük raporu aç</a>${rep.pdf?`<a href="${rep.pdf}" target="_blank" rel="noopener">PDF</a>`:""}</div>`:""}
+      </div>
+      ${L.notes?`<div class="col"><h3>Notlar</h3><div class="small" style="white-space:pre-wrap">${esc(L.notes)}</div></div>`:""}
+    </div><div class="rep">
+      <div class="col"><h3><span class="status good">${done.length+part.length}</span> Yapılanlar</h3>${done.length+part.length?`<ul>${done.concat(part).map(li2).join("")}</ul>`:`<div class="muted small">Kayıt yok</div>`}</div>
+      <div class="col"><h3><span class="status crit">${nd.length}</span> Yapılmayanlar</h3>${nd.length?`<ul>${nd.map(li).join("")}</ul>`:`<div class="muted small">Yok</div>`}</div>
+      <div class="col"><h3><span class="status plan">${(L.extra||[]).length}</span> Program dışı</h3>${(L.extra||[]).length?`<ul>${L.extra.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:`<div class="muted small">Yok</div>`}</div>
+    </div>`;
+  }
+  renderReport(logs.length-1);
+  { const el = document.getElementById("people");
+    const hist = logs.slice(-14).map(L => { const g = Object.values(L.crews||{}).reduce((a,b)=>a+b,0); const p = Object.values((D.crewPlan||{})[L.date]||{}).reduce((a,b)=>a+b,0); return {date:L.date, g, p}; });
+    const mx = Math.max(1, ...hist.map(h=>Math.max(h.g,h.p)));
+    const tot = hist.reduce((a,h)=>a+h.g,0), totp = hist.reduce((a,h)=>a+h.p,0);
+    const byTrade = new Map(); logs.forEach(L => Object.entries(L.crews||{}).forEach(([k,v]) => byTrade.set(k,(byTrade.get(k)||0)+v)));
+    const bt = [...byTrade].sort((a,b)=>b[1]-a[1]).slice(0,10); const bmx = bt.length ? bt[0][1] : 1;
+    el.innerHTML = logs.length ? `
+      <div class="col"><h3>Günlük kişi sayısı <small class="muted">son ${hist.length} gün · toplam ${tot} adam-gün${totp?` / planlanan ${totp}`:""}</small></h3>
+        <div class="hist">${hist.map(h=>`<span>${fmtS(pd(h.date))}</span><div class="b"><div class="p" style="width:${h.p/mx*100}%"></div><div class="a" style="width:${h.g/mx*100}%"></div></div><span class="num">${h.g}${h.p?` / ${h.p}`:""}</span>`).join("")}</div></div>
+      <div class="col"><h3>Meslek dağılımı <small class="muted">adam-gün, tüm raporlar</small></h3>
+        <div class="hist">${bt.map(([k,v])=>`<span>${esc(k)}</span><div class="b"><div class="a" style="width:${v/bmx*100}%;top:2px;bottom:2px"></div></div><span class="num">${v}</span>`).join("")||`<span class="muted small">Henüz giriş yok</span>`}</div></div>
+      <div class="col"><h3>Günlük raporlar</h3><div class="replist">${(D.reports||[]).slice().reverse().map(r=>`<a href="${r.url}" target="_blank" rel="noopener"><b>${fmtS(pd(r.date))}</b> ${r.people} kişi</a>`).join("")||`<span class="muted small">Yok</span>`}</div></div>` : `<div class="empty">Henüz personel girişi yok.</div>`; }
+
+  // ---- geciken işler + sebep dağılımı
+  const reasonsFor = uid => { const m = new Map(); logs.forEach(l => l.entries.forEach(e => { if (e.uid===uid && e.status==="notdone" && e.reason) m.set(e.reason,(m.get(e.reason)||0)+1); })); return [...m].map(([r,n])=>`${r}${n>1?" ×"+n:""}`); };
+  const slips = leaves.filter(t => t.dur>0 && t.pct<100 && ((t.bf && dayDiff(t.f,t.bf)>0) || t.f < today))
+                      .map(t => ({t, slip: t.bf ? dayDiff(t.f,t.bf) : dayDiff(today,t.f)})).filter(x=>x.slip>0).sort((a,b)=>b.slip-a.slip);
+  document.getElementById("slips").innerHTML = slips.length ? slips.slice(0,12).map(({t,slip}) => `<div class="slip" role="button" tabindex="0" data-id="${t.id}">
+      <div><div class="name">${esc(t.name.trim())}</div><div class="muted small">Temel plan ${fmt(t.bs||t.s)} – ${fmt(t.bf||t.f)} · şimdi ${fmt(t.s)} – ${fmt(t.f)}${t.deadline?` · <span style="color:var(--crit)">taahhüt ${fmt(pd(t.deadline))}</span>`:""}</div></div>
+      <div class="d">+${slip} <small>gün</small></div>
+      ${reasonsFor(t.uid).length?`<div class="r">Sebep: ${esc(reasonsFor(t.uid).join(", "))}</div>`:""}
+    </div>`).join("") + (slips.length>12?`<div class="muted small">+${slips.length-12} iş daha</div>`:"") : `<div class="empty">Temel plana göre kayan iş yok.</div>`;
+  { const m = new Map(); logs.forEach(l => l.entries.forEach(e => { if (e.status==="notdone") m.set(e.reason||"Belirtilmedi",(m.get(e.reason||"Belirtilmedi")||0)+1); }));
+    const arr = [...m].sort((a,b)=>b[1]-a[1]); const mx = arr.length ? arr[0][1] : 1;
+    document.getElementById("reasons").innerHTML = arr.length ? `<div class="eyebrow" style="margin-top:14px">Yapılmama sebepleri (iş × gün)</div><div class="reasons">${arr.map(([r,n])=>`<span>${esc(r)}</span><div class="b" style="width:${(n/mx*100).toFixed(0)}%"></div><span class="num">${n}</span>`).join("")}</div>` : ""; }
+
+  // ---- video
+  if (D.video){ const v = document.getElementById("video"); v.hidden = false;
+    v.innerHTML = `<video controls preload="metadata" playsinline src="${D.video.src}"></video><div class="cap"><b>Son drone videosu</b> · ${fmtY(pd(D.video.date))} ${D.video.time}</div>`; }
+
+  // ---- gantt
+  const DAYW = 14;
+  function renderGantt(mode){
+    let rows;
+    if (mode === "all") rows = tasks;
+    else {
+      const lo = new Date(today.getTime()-7*MS), hi = new Date(today.getTime()+21*MS);
+      const keep = new Set();
+      tasks.forEach(t => { if (!t.summary && t.f >= lo && t.s <= hi) keep.add(t.id); });
+      tasks.forEach(t => { if (t.summary && childrenOf(t).some(c => keep.has(c.id))) keep.add(t.id); });
+      rows = tasks.filter(t => keep.has(t.id));
+    }
+    const gs = mode === "all" ? pStart : new Date(today.getTime()-10*MS);
+    const ge = mode === "all" ? pFinish : new Date(today.getTime()+24*MS);
+    const nDays = dayDiff(ge, gs) + 1;
+    const x = d => dayDiff(d, gs) * DAYW;
+    // header
+    let months = "", daysrow = "";
+    for (let i=0;i<nDays;i++){
+      const d = new Date(gs.getTime()+i*MS);
+      if (d.getDate()===1 || i===0){ let span=0; for (let j=i;j<nDays;j++){ const dd=new Date(gs.getTime()+j*MS); if (j>i && dd.getDate()===1) break; span++; } months += `<div style="width:${span*DAYW}px">${AYK[d.getMonth()]} ${d.getFullYear()}</div>`; }
+      const we = d.getDay()===0||d.getDay()===6;
+      daysrow += `<div class="${we?'we':''}" style="width:${DAYW}px" title="${fmtY(d)}">${d.getDate()}</div>`;
+    }
+    const todayX = x(today) + DAYW/2;
+    let html = `<div class="g-grid"><div class="g-head"><div class="g-name" style="height:42px;line-height:42px">İş kalemi</div><div style="position:relative;width:${nDays*DAYW}px"><div class="months">${months}</div><div class="daysrow">${daysrow}</div>${today>=gs&&today<=ge?`<div class="today-lbl" style="left:${todayX}px">BUGÜN</div>`:""}</div></div><div class="g-rows">`;
+    rows.forEach(t => {
+      const st = statusOf(t, today);
+      let bar = "";
+      if (t.s > ge || t.f < gs) bar = "";
+      else if (t.milestone || t.dur === 0) bar = `<div class="ms ${t.pct>=100?'done':''}" style="left:${x(t.s)+2}px" title="${esc(t.name.trim())} · ${fmt(t.s)}"></div>`;
+      else {
+        const left = x(t.s), w = (dayDiff(t.f, t.s)+1)*DAYW - 2;
+        const ag = t.summary ? aggregate(childrenOf(t), today) : null;
+        const fill = t.summary ? ag.actual*100 : t.pct;
+        bar = `<div class="bar ${t.summary?'sumbar':(st.k==='done'?'done':st.k)}" style="left:${left}px;width:${w}px" title="${esc(t.name.trim())} · ${fmt(t.s)} – ${fmt(t.f)} · %${Math.round(fill)}"><div class="fill" style="width:${fill}%"></div></div>`;
+        if (!t.summary && t.bs && t.bf && (t.bs.getTime()!==t.s.getTime() || t.bf.getTime()!==t.f.getTime()) && t.bf >= gs && t.bs <= ge)
+          bar += `<div class="bl" style="left:${x(t.bs)}px;width:${(dayDiff(t.bf,t.bs)+1)*DAYW-2}px" title="Temel plan: ${fmt(t.bs)} – ${fmt(t.bf)}"></div>`;
+      }
+      html += `<div class="g-name ${t.summary?'sum':''} lvl${t.level}" title="${esc(t.name.trim())}" data-id="${t.id}">${esc(t.name.trim())}</div>
+               <div class="g-row ${t.summary?'sum':''}" data-id="${t.id}" style="width:${nDays*DAYW}px">${today>=gs&&today<=ge?`<div class="today" style="left:${todayX}px"></div>`:""}${bar}${!t.summary&&t.dur>0?`<span class="pct num">%${t.pct}</span>`:""}</div>`;
+    });
+    html += `</div></div>`;
+    const g = document.getElementById("gantt"); g.innerHTML = html;
+    document.getElementById("gantt-count").textContent = `${rows.length} satır`;
+    g.scrollLeft = Math.max(0, todayX - 260);
+  }
+  renderGantt("near");
+  document.getElementById("gv-near").onclick = e => { setSeg(e.target); renderGantt("near"); };
+  document.getElementById("gv-all").onclick = e => { setSeg(e.target); renderGantt("all"); };
+  function setSeg(b){ b.parentElement.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed", x===b)); }
+
+  // ---- photos
+  const byId = new Map(tasks.map(t=>[t.id,t]));
+  let filter = null;     // {from,to,label}
+  let selDay = days.length ? days[days.length-1].date : null;
+  const visibleDays = () => filter ? days.filter(d => { const x = pd(d.date); return x >= filter.from && x <= filter.to; }) : days;
+  function renderDays(){
+    const vd = visibleDays();
+    const fb = document.getElementById("filterbar");
+    if (filter){ fb.hidden = false; fb.innerHTML = `<span><b>${esc(filter.label)}</b> dönemine ait çekimler (${fmt(filter.from)} – ${fmt(filter.to)}) · ${vd.length} gün</span><button type="button" id="clearf">Filtreyi kaldır</button>`; document.getElementById("clearf").onclick = () => { filter=null; selDay = days.length?days[days.length-1].date:null; renderDays(); }; }
+    else fb.hidden = true;
+    if (!vd.some(d => d.date === selDay)) selDay = vd.length ? vd[vd.length-1].date : null;
+    document.getElementById("daylist").innerHTML = vd.map(d => { const x = pd(d.date); return `<button type="button" class="day" data-date="${d.date}" aria-pressed="${d.date===selDay}"><div class="d">${x.getDate()} ${AYK[x.getMonth()]}</div><div class="n">${GUN[x.getDay()]} · ${d.total} foto · ${d.sessions.length} seans</div></button>`; }).join("")
+      || `<div class="empty">Bu dönem için çekim yok.</div>`;
+    document.querySelectorAll(".day").forEach(b => b.onclick = () => { selDay = b.dataset.date; renderDays(); });
+    renderSessions();
+    const n = allPhotos.length, v = days.reduce((a,d)=>a+d.videos,0);
+    document.getElementById("photo-summary").textContent = days.length ? `Gizlilik gereği panoda yalnızca son ${days.length} günün çekimleri gösterilir (${n} fotoğraf). Tüm arşiv şantiye şefinde.` : "";
+  }
+  function renderSessions(){
+    const d = days.find(x => x.date === selDay);
+    const el = document.getElementById("sessions");
+    if (!d){ el.innerHTML = ""; return; }
+    const x = pd(d.date);
+    const worked = leaves.filter(t => t.dur>0 && t.s <= x && t.f >= x).map(t => t.name.trim());
+    el.innerHTML = `<div class="muted small">${fmtY(x)} ${GUN[x.getDay()]} · programda o gün: ${worked.length ? esc(worked.slice(0,4).join(" · ")) + (worked.length>4?` (+${worked.length-4})`:"") : "iş yok"}</div>` +
+      d.sessions.map((s,i) => `<div class="session"><div class="sh"><h3>${["Sabah","Öğle","Akşam"][i] && d.sessions.length<=3 ? ["Sabah","Öğle","Akşam"][i] : s.id} çekimi</h3><span class="muted small">${s.start}${s.end!==s.start?" – "+s.end:""} · ${s.n} fotoğraf${s.photos.length<s.n?` (${s.photos.length} panoda)`:""}</span></div>
+        <div class="grid">${s.photos.map(p => `<button type="button" class="ph" data-idx="${allPhotos.findIndex(q=>q.f===p.f)}"><img src="${p.src}" alt="${esc(p.f)}" loading="lazy"><span>${p.t}</span></button>`).join("")}</div></div>`).join("");
+    el.querySelectorAll(".ph").forEach(b => b.onclick = () => openLb(+b.dataset.idx));
+  }
+  renderDays();
+
+  function focusTask(id){
+    const t = byId.get(id); if (!t) return;
+    filter = {from:t.s, to:t.f, label:t.name.trim()};
+    renderDays();
+    document.getElementById("photos-sec").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  document.addEventListener("click", e => { const el = e.target.closest("[data-id]"); if (el && !e.target.closest(".gantt-tools")) focusTask(+el.dataset.id); });
+  document.addEventListener("keydown", e => { if ((e.key==="Enter"||e.key===" ") && e.target.matches(".task,.phase")) { e.preventDefault(); focusTask(+e.target.dataset.id); } });
+
+  // ---- compare
+  const selA = document.getElementById("cmpA"), selB = document.getElementById("cmpB");
+  const opts = days.map(d => `<option value="${d.date}">${fmtY(pd(d.date))}</option>`).join("");
+  selA.innerHTML = opts; selB.innerHTML = opts;
+  if (days.length){ selA.value = days[0].date; selB.value = days[days.length-1].date; }
+  function cover(date){ const d = days.find(x=>x.date===date); const p = d && d.sessions[0] && d.sessions[0].photos[0]; return p ? {...p, date} : null; }
+  function renderCmp(){
+    [[selA,"cmpAimg"],[selB,"cmpBimg"]].forEach(([s,id]) => { const p = cover(s.value); const b = document.getElementById(id);
+      b.innerHTML = p ? `<img src="${p.src}" alt="${s.value}"><span>${fmtS(pd(p.date))} ${p.t}</span>` : ""; b.onclick = p ? () => openLb(allPhotos.findIndex(q=>q.f===p.f)) : null; });
+  }
+  selA.onchange = renderCmp; selB.onchange = renderCmp; renderCmp();
+
+  // ---- lightbox
+  let cur = -1;
+  const lb = document.getElementById("lb"), lbImg = document.getElementById("lb-img"), lbCap = document.getElementById("lb-cap");
+  function openLb(i){ if (i<0||i>=allPhotos.length) return; cur=i; const p=allPhotos[i]; lbImg.src=p.src; lbImg.alt=p.f;
+    lbCap.textContent = `${fmtY(pd(p.date))} ${p.t} · ${p.sid} · ${p.f}${p.alt!=null?" · "+p.alt.toFixed(0)+" m":""} (${i+1}/${allPhotos.length})`; lb.hidden=false; document.body.style.overflow="hidden"; }
+  function closeLb(){ lb.hidden=true; document.body.style.overflow=""; }
+  document.getElementById("lb-close").onclick = closeLb;
+  document.getElementById("lb-prev").onclick = () => openLb(cur-1);
+  document.getElementById("lb-next").onclick = () => openLb(cur+1);
+  lb.addEventListener("click", e => { if (e.target === lb || e.target.classList.contains("img")) closeLb(); });
+  document.addEventListener("keydown", e => { if (lb.hidden) return; if (e.key==="Escape") closeLb(); if (e.key==="ArrowLeft") openLb(cur-1); if (e.key==="ArrowRight") openLb(cur+1); });
+
+  // ---- footer
+  document.getElementById("foot").innerHTML = `<span>Planlanan %: her işin ${D.project.baseline?'temel plan (baseline)':'program'} tarihlerine göre bugün itibarıyla tamamlanmış olması gereken payı, iş süresiyle ağırlıklı (kilometre taşları hariç, 1 Aralık ileri kaba teslim kapsamı). Tahmini teslim: günlük raporlar işlendikten sonra MS Project'in hesapladığı yeni bitiş.</span>
+    <span>Gerçekleşen %: MS Project dosyasına girilen tamamlanma yüzdesi (durum tarihi ${D.project.statusDate ? fmtS(pd(D.project.statusDate)) : "—"}). "Geride" = gerçekleşen, planlananın altında; "Gecikmiş" = bitiş tarihi geçmiş veya fark %50'den büyük.</span>
+    <span>Veri: ${esc(D.project.source||"")} · dışa aktarma ${esc(D.project.exported||"")} · fotoğraf arşivi ${esc(D.photosGenerated||"")} · DJI Mini 5 Pro.</span>`;
+})();
+</script>
+<a href="/cikis" style="position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:40;font:13px Segoe UI,sans-serif;background:var(--surface);color:var(--accent-ink);border:1px solid var(--line-strong);border-radius:999px;padding:5px 12px;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,.15)">Çıkış</a></body></html>
