@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#2b5d8c">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Alas Takip">
+<title>Alas Takip</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#f3f4f6;--sf:#fff;--line:#d5d9e0;--fg:#15202b;--fg2:#4b5563;--fg3:#7a8494;--acc:#2b5d8c;--crit:#c73a3a}
+@media (prefers-color-scheme:dark){:root{--bg:#12161b;--sf:#1b2129;--line:#2f3844;--fg:#eef1f4;--fg2:#b6bfca;--fg3:#7f8a98;--acc:#6fa3d6;--crit:#e46262;color-scheme:dark}}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 Barlow,"Segoe UI",system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:16px}
+.card{width:100%;max-width:380px;background:var(--sf);border:1px solid var(--line);border-radius:10px;padding:26px 24px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.brand{font:700 13px/1 Barlow,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
+h1{font:700 30px/1.05 "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;margin:6px 0 2px}
+.sub{color:var(--fg3);font-size:14px;margin-bottom:20px}
+label{display:block;font-size:13px;color:var(--fg2);margin-bottom:4px}
+input[type=password]{width:100%;font:inherit;font-size:17px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--sf);color:var(--fg)}
+input:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button{width:100%;margin-top:14px;font:600 16px Barlow,sans-serif;padding:11px;border:0;border-radius:8px;background:var(--acc);color:#fff;cursor:pointer}
+button:disabled{opacity:.6;cursor:default}
+.err{color:var(--crit);font-size:14px;min-height:20px;margin-top:10px}
+.foot{color:var(--fg3);font-size:12.5px;margin-top:16px;border-top:1px solid var(--line);padding-top:10px}
+</style></head><body>
+<form class="card" id="f" autocomplete="on">
+  <div class="brand">Alas Takip</div>
+  <h1>338 Ada Depo / Restoran</h1>
+  <div class="sub">Şantiye ilerleme ve günlük rapor panosu</div>
+  <input type="text" name="username" value="alas-takip" autocomplete="username" hidden>
+  <label for="pw">Giriş şifresi</label>
+  <input type="password" id="pw" autocomplete="current-password" required autofocus>
+  <button type="submit" id="go">Giriş</button>
+  <div class="err" id="err" role="alert"></div>
+  <div class="foot">Bu cihazda bir kez girmeniz yeterli. Telefonda paylaş menüsünden "Ana Ekrana Ekle" ile uygulama gibi kullanabilirsiniz.</div>
+</form>
+<script>
+const SALT = "R614gLcuIUGoyU7IUVmniQ==", ITER = 210000;
+const q = new URLSearchParams(location.search);
+const next = (q.get("next") || "").replace(/^\/+/, "").replace(/[^\w\-\/.]/g, "");
+const target = next ? next : "app.html";
+const $ = s => document.querySelector(s);
+function db(){ return new Promise((res, rej) => { const r = indexedDB.open("alas", 1); r.onupgradeneeded = () => r.result.createObjectStore("k"); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+async function idb(op, val){ const d = await db(); return new Promise((res, rej) => { const st = d.transaction("k", op === "get" ? "readonly" : "readwrite").objectStore("k");
+  const r = op === "get" ? st.get("key") : op === "put" ? st.put(val, "key") : st.delete("key"); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+async function swReady(){
+  if (!("serviceWorker" in navigator)) throw new Error("Bu tarayıcı desteklenmiyor. Güncel Chrome, Safari veya Edge kullanın.");
+  await navigator.serviceWorker.register("sw.js");
+  const reg = await navigator.serviceWorker.ready;
+  return reg;
+}
+async function tell(msg){ try { const reg = await navigator.serviceWorker.ready; reg.active && reg.active.postMessage(msg); } catch(e){} }
+async function check(key){
+  const r = await fetch("check.enc", {cache: "no-cache"}); const b = await r.arrayBuffer();
+  const p = await crypto.subtle.decrypt({name: "AES-GCM", iv: b.slice(0, 12)}, key, b.slice(12));
+  return new TextDecoder().decode(p) === "alas-ok";
+}
+(async () => {
+  try {
+    await swReady();
+    if (q.has("cikis")) { await idb("del"); await tell("reset"); history.replaceState(null, "", location.pathname); return; }
+    const k = await idb("get");
+    if (k) { try { if (await check(k)) { await tell("reset"); location.replace(target); return; } } catch(e){} await idb("del"); }
+  } catch (e) { $("#err").textContent = e.message || String(e); }
+})();
+$("#f").addEventListener("submit", async ev => {
+  ev.preventDefault(); $("#err").textContent = ""; $("#go").disabled = true; $("#go").textContent = "Kontrol ediliyor…";
+  try {
+    await swReady();
+    const base = await crypto.subtle.importKey("raw", new TextEncoder().encode($("#pw").value.trim()), "PBKDF2", false, ["deriveKey"]);
+    const salt = Uint8Array.from(atob(SALT), c => c.charCodeAt(0));
+    const key = await crypto.subtle.deriveKey({name: "PBKDF2", salt, iterations: ITER, hash: "SHA-256"}, base, {name: "AES-GCM", length: 256}, false, ["decrypt"]);
+    let ok = false; try { ok = await check(key); } catch(e) { ok = false; }
+    if (!ok) { $("#err").textContent = "Şifre yanlış. Tekrar deneyin."; return; }
+    await idb("put", key); await tell("reset");
+    location.replace(target);
+  } catch (e) { $("#err").textContent = e.message || "Giriş yapılamadı. Sayfayı yenileyip tekrar deneyin."; }
+  finally { $("#go").disabled = false; $("#go").textContent = "Giriş"; }
+});
+</script></body></html>
