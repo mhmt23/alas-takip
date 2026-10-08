@@ -4,3 +4,4 @@ node_modules/
 # Yerel çalışma verisi (Railway'de /data Volume'unun karşılığı)
 data/
 .env
+.env.*

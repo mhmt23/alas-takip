@@ -44,6 +44,18 @@ function proxyGuveni(v, varsayilan) {
   return String(v).trim();
 }
 
+/**
+ * Dışarıya verilecek linklerin kökü (örn. sihirli link). PUBLIC_URL varsa o; yoksa
+ * X-Forwarded-Proto'nun İLK girdisi (Railway zinciri "https, http" gönderir; Fastify'ın
+ * req.protocol'ü son girdiyi aldığı için http çıkar) + istek host'u.
+ */
+export function disKok(config, req) {
+  if (config.PUBLIC_URL) return config.PUBLIC_URL;
+  const xfp = req.headers['x-forwarded-proto'];
+  const proto = xfp ? String(xfp).split(',')[0].trim() || req.protocol : req.protocol;
+  return `${proto}://${req.host}`;
+}
+
 /** Veri dizinini çözer (DATA_DIR); tanımsızsa proje kökündeki ./data. */
 export function resolveDataDir(env = process.env) {
   return bos(env.DATA_DIR) ? path.join(KOK_DIZIN, 'data') : path.resolve(env.DATA_DIR);
@@ -82,6 +94,24 @@ export function loadConfig(env = process.env) {
 
   const TRUST_PROXY = proxyGuveni(env.TRUST_PROXY, isProd);
 
+  // Dışarıdan görünen kök adres (sihirli link üretimi için). Proxy arkasında X-Forwarded-Proto
+  // zinciri "https, http" gibi gelebildiğinden prod'da açıkça verilmesi önerilir.
+  // Yalnız şema + alan adı: https://takip.firma.com
+  let PUBLIC_URL = '';
+  if (!bos(env.PUBLIC_URL)) {
+    const ham = String(env.PUBLIC_URL).trim().replace(/\/+$/, '');
+    let u;
+    try {
+      u = new URL(ham);
+    } catch {
+      throw new YapilandirmaHatasi(`PUBLIC_URL geçersiz: "${env.PUBLIC_URL}"`);
+    }
+    if (!['http:', 'https:'].includes(u.protocol) || u.pathname !== '/' || u.search || u.hash || u.username) {
+      throw new YapilandirmaHatasi('PUBLIC_URL yalnız şema ve alan adı içermeli (örn. https://takip.firma.com)');
+    }
+    PUBLIC_URL = u.origin;
+  }
+
   // Oturum gizi: prod'da zorunlu; dev'de rastgele üretilir (yeniden başlatınca oturumlar düşer)
   let SESSION_SECRET = bos(env.SESSION_SECRET) ? '' : String(env.SESSION_SECRET);
   let secretGenerated = false;
@@ -118,6 +148,7 @@ export function loadConfig(env = process.env) {
     PUBLIC_DIR,
     TZ,
     TRUST_PROXY,
+    PUBLIC_URL,
     LOG_LEVEL,
     ADMIN_USER,
     isProd,

@@ -1,5 +1,6 @@
 // Giriş/çıkış, oturum bilgisi ve sihirli link rotaları (V1-SPEC §4–§5).
 import { requireAuth, safeNext, isWebview, isCrawler } from '../auth.js';
+import { disKok } from '../config.js';
 
 const SAYFA_STIL = `
   :root{color-scheme:light dark;--bg:#f4f6f8;--card:#fff;--ink:#1c2630;--mut:#5b6773;--line:#d5dce3;--acc:#2b5d8c}
@@ -62,7 +63,7 @@ function webviewSayfa(url) {
   );
 }
 
-export default async function authRoutes(app, { auth, audit }) {
+export default async function authRoutes(app, { config, auth, audit }) {
   // ---- POST /api/login (JSON ya da form)
   app.post(
     '/api/login',
@@ -113,7 +114,7 @@ export default async function authRoutes(app, { auth, audit }) {
     const ua = req.headers['user-agent'];
     const onYukleme = /prefetch|prerender/i.test(`${req.headers.purpose ?? ''} ${req.headers['sec-purpose'] ?? ''}`);
     if (isWebview(ua) || isCrawler(ua) || req.method === 'HEAD' || onYukleme) {
-      const url = `${req.protocol}://${req.host}/g/${token}`;
+      const url = `${disKok(config, req)}/g/${token}`;
       return reply.type('text/html; charset=utf-8').send(webviewSayfa(url));
     }
 

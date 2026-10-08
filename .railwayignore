@@ -1,0 +1,14 @@
+# railway up arşivine girmeyecekler (Docker build'in de ihtiyacı yok)
+d/
+check.enc
+ornek/
+_acik/
+data/
+node_modules/
+plan-ekleri/
+PATRON-PLANI.md
+docs/
+.env
+.env.*
+.claude/
+.git/

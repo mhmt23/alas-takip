@@ -5,6 +5,7 @@ import path from 'node:path';
 import { requireRole, ROLLER, isValidUsername, normalizeUsername } from '../auth.js';
 import { safeJoin, writeStreamAtomic, writeJsonAtomic, YolHatasi } from '../store.js';
 import { DATASETLER } from '../pano.js';
+import { disKok } from '../config.js';
 
 const YUKLEME_LIMITI = 100 * 1024 * 1024; // 100 MB
 const IZINLI_KOKLER = ['web', 'rapor', 'main', 'ornek'];
@@ -59,7 +60,7 @@ export default async function adminRoutes(app, { config, auth, audit, auditTail 
     const { token, expiresAt } = await auth.createMagicLink({ label, days, maxDevices });
     // Token loga/denetime yazılmaz
     await audit(req, 'sihirli-link-olustur', { label, days, maxDevices });
-    return { url: `${req.protocol}://${req.host}/g/${token}`, token, expiresAt: new Date(expiresAt).toISOString() };
+    return { url: `${disKok(config, req)}/g/${token}`, token, expiresAt: new Date(expiresAt).toISOString() };
   });
 
   // ---- oturumlar
