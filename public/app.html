@@ -145,6 +145,8 @@ section{margin-top:26px}
 .ph{position:relative;aspect-ratio:4/3;max-width:100%;background:var(--surface-2);border-radius:4px;overflow:hidden;border:0;padding:0;cursor:zoom-in}
 .ph img{width:100%;height:100%;object-fit:cover;display:block}
 .ph span{position:absolute;left:6px;bottom:5px;background:rgba(0,0,0,.55);color:#fff;font-size:11.5px;padding:1px 6px;border-radius:3px}
+.grid.tur{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.ph.vid{cursor:default;background:#000}.ph.vid video{width:100%;height:100%;object-fit:cover;display:block}
 .compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
 @media (max-width:560px){.compare{grid-template-columns:1fr}}
 .cmp select{font:inherit;width:100%;padding:6px 8px;border:1px solid var(--line-strong);border-radius:var(--radius);background:var(--surface);color:var(--fg);margin-bottom:6px}
@@ -551,8 +553,8 @@ footer{margin-top:36px;padding-top:12px;border-top:1px solid var(--line);font-si
     const x = pd(d.date);
     const worked = leaves.filter(t => t.dur>0 && t.s <= x && t.f >= x).map(t => t.name.trim());
     el.innerHTML = `<div class="muted small">${fmtY(x)} ${GUN[x.getDay()]} · programda o gün: ${worked.length ? esc(worked.slice(0,4).join(" · ")) + (worked.length>4?` (+${worked.length-4})`:"") : "iş yok"}</div>` +
-      d.sessions.map((s,i) => `<div class="session"><div class="sh"><h3>${["Sabah","Öğle","Akşam"][i] && d.sessions.length<=3 ? ["Sabah","Öğle","Akşam"][i] : s.id} çekimi</h3><span class="muted small">${s.start}${s.end!==s.start?" – "+s.end:""} · ${s.n} fotoğraf${s.photos.length<s.n?` (${s.photos.length} panoda)`:""}</span></div>
-        <div class="grid">${s.photos.map(p => `<button type="button" class="ph" data-idx="${allPhotos.findIndex(q=>q.f===p.f)}"><img src="${p.src}" alt="${esc(p.f)}" loading="lazy"><span>${p.t}</span></button>`).join("")}</div></div>`).join("");
+      d.sessions.map((s,i) => `<div class="session"><div class="sh"><h3>${s.label ? s.label : (["Sabah","Öğle","Akşam"][i] && d.sessions.length<=3 ? ["Sabah","Öğle","Akşam"][i] : s.id)} çekimi</h3><span class="muted small">${s.start}${s.end!==s.start?" – "+s.end:""}</span></div>
+        <div class="grid tur">${s.photos.map(p => `<button type="button" class="ph" data-idx="${allPhotos.findIndex(q=>q.f===p.f)}"><img src="${p.src}" alt="${esc(p.f)}" loading="lazy"><span>${p.t}</span></button>`).join("")}${s.video?`<div class="ph vid"><video controls preload="metadata" playsinline muted src="${s.video}"></video><span>video ${esc(s.videoTime||"")}</span></div>`:""}</div></div>`).join("");
     el.querySelectorAll(".ph").forEach(b => b.onclick = () => openLb(+b.dataset.idx));
   }
   renderDays();
