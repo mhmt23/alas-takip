@@ -365,7 +365,7 @@ footer{margin-top:36px;padding-top:12px;border-top:1px solid var(--line);font-si
   const late = scope.filter(t => ["warn","crit"].includes(statusOf(t,today).k)).length;
   document.getElementById("verdict").className = "verdict " + verdictK;
   document.getElementById("verdict").innerHTML = `
-    <div><div class="eyebrow">İleri kaba teslim (${fmt(handover)}) hedefine göre</div><div class="big">${esc(verdictT)}</div></div>
+    <div><div class="eyebrow">İleri kaba teslim (${fmt(handover)}) hedefine göre</div><div class="big">${esc(verdictT)}</div>${fc && varDays < -1 && fcSlip <= 0 ? `<div class="small" style="color:var(--fg-2);margin-top:6px">Geride kalan işlerin bolluğu olduğu için MS Project teslim tarihini henüz kaydırmıyor. Bu işler bolluklarını aşarsa tahmini teslim de kayar.</div>` : ""}${fc && fcSlip > 0 ? `<div class="small" style="color:var(--crit);margin-top:6px">Kritik yoldaki gecikme teslim tarihini ${fcSlip} gün ileri itti.</div>` : ""}</div>
     <div>
       <div class="dualbar" aria-hidden="true"><div class="p" style="width:${(tot.planned*100).toFixed(1)}%"></div><div class="a" style="width:${(tot.actual*100).toFixed(1)}%"></div></div>
       <div class="pcts num"><span>Gerçekleşen <b>%${Math.round(tot.actual*100)}</b></span><span>Planlanan <b>%${Math.round(tot.planned*100)}</b></span></div>
