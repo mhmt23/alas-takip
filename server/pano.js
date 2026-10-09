@@ -12,7 +12,7 @@ export const DATASETLER = ['main', 'ornek'];
 /** PANO_DATA anahtarları, app.html'in beklediği sırayla. */
 export const PANO_ANAHTARLARI = [
   'project', 'generated', 'photosGenerated', 'banner', 'tasks', 'days',
-  'logs', 'video', 'reports', 'trades', 'crewPlan',
+  'logs', 'video', 'reports', 'trades', 'crewPlan', 'kararlar', 'projeler',
 ];
 
 const DOSYALAR = {
@@ -25,6 +25,8 @@ const DOSYALAR = {
   trades: 'trades.json',
   banner: 'banner.json',
   meta: 'meta.json',
+  kararlar: 'kararlar.json',   // Revizyonlar sekmesi: metraj değişiklikleri + alınan kararlar
+  projeler: 'projeler.json',   // Projeler sekmesi: güncel paftalar, görseller
 };
 const LOG_DOSYA_RE = /^\d{4}-\d{2}-\d{2}\.json$/;
 
@@ -89,9 +91,9 @@ async function imzaHesapla(dizin) {
 
 async function parcalariOku(dizin, log) {
   const oku = (ad, varsayilan) => readJson(path.join(dizin, DOSYALAR[ad]), varsayilan);
-  const [project, tasks, days, video, crewPlan, reports, trades, banner, meta] = await Promise.all([
+  const [project, tasks, days, video, crewPlan, reports, trades, banner, meta, kararlar, projeler] = await Promise.all([
     oku('project', {}), oku('tasks', []), oku('days', []), oku('video', null), oku('crewPlan', {}),
-    oku('reports', []), oku('trades', []), oku('banner', {}), oku('meta', {}),
+    oku('reports', []), oku('trades', []), oku('banner', {}), oku('meta', {}), oku('kararlar', {}), oku('projeler', {}),
   ]);
   const logDizin = path.join(dizin, 'logs');
   const logs = [];
@@ -104,7 +106,7 @@ async function parcalariOku(dizin, log) {
       log?.warn({ err, dosya: ad }, 'günlük rapor okunamadı, atlandı');
     }
   }
-  return { project, tasks, days, video, crewPlan, reports, trades, banner, meta, logs };
+  return { project, tasks, days, video, crewPlan, reports, trades, banner, meta, logs, kararlar, projeler };
 }
 
 function birlestir(p, generated) {
@@ -120,6 +122,8 @@ function birlestir(p, generated) {
     reports: dizi(p.reports),
     trades: dizi(p.trades),
     crewPlan: nesneMi(p.crewPlan) ? p.crewPlan : {},
+    kararlar: nesneMi(p.kararlar) ? p.kararlar : {},
+    projeler: nesneMi(p.projeler) ? p.projeler : {},
   };
 }
 

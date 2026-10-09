@@ -287,6 +287,57 @@ h3{font:600 17px/1.25 var(--font);margin:0}
 /* ışık kutusu */
 .lb{position:fixed;inset:0;z-index:80;background:rgba(10,11,13,.94);display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .22s var(--ease)}
 .lb.open{opacity:1;pointer-events:auto}
+
+/* revizyonlar */
+.mtiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.mtiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mtile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.mtile .k{font-size:13px;color:var(--ink-3)}
+.mtile .v{font:700 26px/1.1 var(--font-cond);margin-top:2px}
+.mtile .v small{font:500 13px var(--font);color:var(--ink-3)}
+.mtile .d{font:600 13px var(--font);margin-top:4px}
+.up{color:var(--warn)}.down{color:var(--good)}.same{color:var(--ink-3)}
+.mt{width:100%;border-collapse:collapse;font-size:14px}
+.mt th{font:600 12.5px var(--font);color:var(--ink-3);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line-2)}
+.mt{table-layout:fixed}.mt th:nth-child(1){width:32%}.mt th:nth-child(2),.mt th:nth-child(3){width:15%}.mt th:nth-child(4){width:13%}
+.mt td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.mt td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mt td .x{display:block;font-size:12.5px;color:var(--ink-3)}
+@media (max-width:640px){.mt thead{display:none}.mt tr{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .mt td{border:0;padding:0}.mt td.k{grid-column:1/-1;font-weight:600}.mt td.n{text-align:left}.mt td.nt{grid-column:1/-1}}
+.tl{list-style:none;margin:0;padding:0;position:relative}
+.tl::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tl li{position:relative;padding:0 0 18px 30px}
+.tl li::before{content:"";position:absolute;left:1px;top:5px;width:14px;height:14px;border-radius:50%;background:var(--surface);border:3px solid var(--yellow)}
+.tl .t{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.tl .t b{font:600 16px var(--font)}
+.tl .t span{font-size:12.5px;color:var(--ink-3)}
+.tl .tag{font:600 11.5px var(--font);background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--ink-2)}
+.tl p{margin:4px 0 0;color:var(--ink-2);max-width:78ch}
+.tl .etki{margin-top:6px;font:600 13px var(--font);color:var(--ink)}
+/* projeler */
+.gal{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px}
+@media (max-width:760px){.gal{grid-template-columns:1fr}}
+.gal .main{position:relative;border-radius:var(--r-lg);overflow:hidden;background:var(--graphite);border:0;padding:0;cursor:zoom-in;aspect-ratio:16/10}
+.gal .main img{width:100%;height:100%;object-fit:cover}
+.gal .main .cap{position:absolute;left:12px;bottom:12px}
+.gal .thumbs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-content:start}
+.gal .thumbs button{position:relative;aspect-ratio:16/10;border-radius:var(--r);overflow:hidden;border:2px solid transparent;padding:0;background:var(--graphite);cursor:pointer}
+.gal .thumbs button[aria-pressed="true"]{border-color:var(--yellow)}
+.gal .thumbs img{width:100%;height:100%;object-fit:cover}
+.cap{background:rgba(20,22,25,.72);color:#fff;font-size:12.5px;padding:3px 10px;border-radius:999px}
+.sheets{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.sheet{display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:8px;cursor:zoom-in;text-align:left;font:inherit;color:inherit}
+.sheet:hover{border-color:var(--ink-3)}
+.sheet .im{aspect-ratio:3/2;background:#fff;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.sheet .im img{width:100%;height:100%;object-fit:contain}
+.sheet b{font:600 14px var(--font)}
+.sethead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:8px 16px;margin-bottom:12px}
+.sethead p{margin:2px 0 0;color:var(--ink-3);font-size:13px}
+.lb .open-full{color:#fff;font-size:13px}
+@media (max-width:720px){.tab .l{display:none}}
+@media (min-width:721px){.tab .s{display:none}}
+
 .lb .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;color:#fff;font-size:14px}
 .lb .bar button{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);color:#fff;border-radius:999px;padding:6px 14px;cursor:pointer}
 .lb .img{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px 8px calc(16px + env(safe-area-inset-bottom,0px))}
@@ -330,10 +381,12 @@ footer img{height:22px;width:auto;opacity:.8;margin-bottom:6px}
   </div>
   <nav class="tabs" role="tablist" aria-label="Bölümler">
     <button class="tab" role="tab" id="tab-ozet" aria-controls="ozet" data-t="ozet"><svg viewBox="0 0 24 24"><path d="M4 15a8 8 0 1 1 16 0"/><path d="M12 15l4-5"/><circle cx="12" cy="15" r="1.4"/></svg><span>Özet</span></button>
-    <button class="tab" role="tab" id="tab-rapor" aria-controls="rapor" data-t="rapor"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM8.5 12h7M8.5 16h5"/></svg><span>Günlük rapor</span></button>
+    <button class="tab" role="tab" id="tab-rapor" aria-controls="rapor" data-t="rapor"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM8.5 12h7M8.5 16h5"/></svg><span class="l">Günlük rapor</span><span class="s">Rapor</span></button>
     <button class="tab" role="tab" id="tab-program" aria-controls="program" data-t="program"><svg viewBox="0 0 24 24"><path d="M4 6h9M7 11h10M10 16h10M4 21h16"/></svg><span>Program</span></button>
     <button class="tab" role="tab" id="tab-ekip" aria-controls="ekip" data-t="ekip"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 18.5"/></svg><span>Ekip</span></button>
-    <button class="tab" role="tab" id="tab-cekim" aria-controls="cekim" data-t="cekim"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13.2" r="3.4"/></svg><span>Çekimler</span></button>
+    <button class="tab" role="tab" id="tab-cekim" aria-controls="cekim" data-t="cekim"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13.2" r="3.4"/></svg><span class="l">Çekimler</span><span class="s">Çekim</span></button>
+    <button class="tab" role="tab" id="tab-revizyon" aria-controls="revizyon" data-t="revizyon"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 2"/><path d="M3.5 12a8.5 8.5 0 1 0 2.5-6"/><path d="M3 4v4h4"/></svg><span class="l">Revizyonlar</span><span class="s">Revizyon</span></button>
+    <button class="tab" role="tab" id="tab-proje" aria-controls="proje" data-t="proje"><svg viewBox="0 0 24 24"><path d="M4 5h11l5 5v9H4z"/><path d="M15 5v5h5M8 14h8M8 17h5"/></svg><span class="l">Projeler</span><span class="s">Proje</span></button>
     <span class="tab-ink" aria-hidden="true"></span>
   </nav>
 </header>
@@ -344,6 +397,8 @@ footer img{height:22px;width:auto;opacity:.8;margin-bottom:6px}
   <section class="panel" id="program" role="tabpanel" aria-labelledby="tab-program" hidden></section>
   <section class="panel" id="ekip" role="tabpanel" aria-labelledby="tab-ekip" hidden></section>
   <section class="panel" id="cekim" role="tabpanel" aria-labelledby="tab-cekim" hidden></section>
+  <section class="panel" id="revizyon" role="tabpanel" aria-labelledby="tab-revizyon" hidden></section>
+  <section class="panel" id="proje" role="tabpanel" aria-labelledby="tab-proje" hidden></section>
 </main>
 <footer id="foot"></footer>
 
@@ -695,10 +750,61 @@ footer img{height:22px;width:auto;opacity:.8;margin-bottom:6px}
     }
   }
 
+
+  // ================= REVİZYONLAR =================
+  function renderRevizyon() {
+    const el = $("#revizyon"), K = D.kararlar || {}, M = K.metraj, kar = (K.kararlar || []).slice().sort((a, b) => a.tarih < b.tarih ? 1 : -1);
+    if (!M && !kar.length) { el.innerHTML = `<div class="sec-h"><h2>Revizyonlar</h2></div><div class="empty">Proje revizyonları, metraj değişiklikleri ve alınan kararlar eklendikçe burada listelenir.</div>`; return; }
+    const nf = v => v == null ? "—" : Number(v).toLocaleString("tr-TR", { maximumFractionDigits: 2 });
+    const fark = (a, b) => { if (a == null || b == null) return { t: a == null ? "yeni" : "çıktı", c: "up" }; const d = b - a; if (Math.abs(d) < 1e-9) return { t: "değişmedi", c: "same" }; const p = a ? Math.round(d / a * 100) : null; return { t: `${d > 0 ? "+" : "−"}${nf(Math.abs(d))}${p != null ? ` (${d > 0 ? "+" : "−"}%${Math.abs(p)})` : ""}`, c: d > 0 ? "up" : "down" }; };
+    const birim = (k, g) => k.birim ?? g.birim ?? "";
+    el.innerHTML = `
+      ${M ? `<section class="card">
+        <div class="sec-h" style="margin-bottom:12px"><h2>${esc(M.baslik || "Metraj değişiklikleri")}</h2><p>${esc(M.aciklama || "")}</p></div>
+        ${(M.ozet || []).length ? `<div class="mtiles">${M.ozet.map(o => { const f = fark(o.once, o.sonra); return `<div class="mtile"><div class="k">${esc(o.kalem)}</div><div class="v num">${nf(o.sonra)} <small>${esc(o.birim)}</small></div><div class="d ${f.c}">${f.t} <span class="muted" style="font-weight:500">· ilk ${nf(o.once)}</span></div></div>`; }).join("")}</div>` : ""}
+        ${(M.gruplar || []).map(g => `<h3 style="margin:20px 0 6px">${esc(g.ad)}</h3>
+          <div style="overflow-x:auto"><table class="mt"><thead><tr><th>Kalem</th><th style="text-align:right">İlk metraj</th><th style="text-align:right">Güncel</th><th style="text-align:right">Fark</th><th>Kaynak / not</th></tr></thead><tbody>
+          ${g.kalemler.map(k => { const tx = k.once_metin || k.sonra_metin; const f = tx ? { t: "değişti", c: "up" } : fark(k.once, k.sonra); const b = birim(k, g);
+            return `<tr><td class="k">${esc(k.kalem)}</td><td class="n">${tx ? esc(k.once_metin || "—") : `${nf(k.once)} ${k.once != null ? esc(b) : ""}`}</td><td class="n"><b>${tx ? esc(k.sonra_metin || "—") : `${nf(k.sonra)} ${esc(b)}`}</b></td><td class="n ${f.c}">${f.t}</td><td class="nt">${esc(k.not || "")}<span class="x">${esc(k.kaynak || "")}</span></td></tr>`; }).join("")}
+          </tbody></table></div>`).join("")}
+      </section>` : ""}
+      <section class="card">
+        <div class="sec-h" style="margin-bottom:14px"><h2>Alınan kararlar</h2><p>Programı, metrajı veya uygulamayı değiştiren kararlar; en yenisi üstte.</p></div>
+        ${kar.length ? `<ul class="tl">${kar.map(k => `<li><div class="t"><b>${esc(k.baslik)}</b><span>${fmtY(pd(k.tarih))}</span>${k.tur ? `<span class="tag">${esc(k.tur)}</span>` : ""}</div>${k.aciklama ? `<p>${esc(k.aciklama)}</p>` : ""}${k.etki ? `<div class="etki">Etkisi: ${esc(k.etki)}</div>` : ""}</li>`).join("")}</ul>` : `<div class="empty">Henüz karar kaydı yok.</div>`}
+      </section>
+      ${K.guncelleme ? `<p class="muted small">Son güncelleme ${fmtY(pd(K.guncelleme))}</p>` : ""}`;
+  }
+
+  // ================= PROJELER =================
+  let galIdx = 0;
+  function renderProje() {
+    const el = $("#proje"), P = D.projeler || {}, G = P.gorseller || [], S = P.setler || [];
+    if (!G.length && !S.length) { el.innerHTML = `<div class="sec-h"><h2>Projeler</h2></div><div class="empty">Güncel proje paftaları ve görseller eklendiğinde burada görünür.</div>`; return; }
+    const g = G[galIdx] || G[0];
+    el.innerHTML = `
+      ${G.length ? `<section class="card">
+        <div class="sec-h" style="margin-bottom:12px"><h2>Görseller</h2><p>Mimari görseller ve statik Tekla modelinden görünümler.</p></div>
+        <div class="gal"><button type="button" class="main" data-gal="${galIdx}"><img src="${esc(g.src)}" alt="${esc(g.ad)}"><span class="cap">${esc(g.ad)}${g.not ? " · " + esc(g.not) : ""}</span></button>
+          <div class="thumbs">${G.map((x, i) => `<button type="button" data-th="${i}" aria-pressed="${i === galIdx}" aria-label="${esc(x.ad)}"><img src="${esc(x.k)}" alt="" loading="lazy"></button>`).join("")}</div></div>
+      </section>` : ""}
+      ${S.map((s, si) => `<section class="card">
+        <div class="sethead"><div><h2>${esc(s.ad)}</h2><p>${esc(s.rev)} · ${s.paftalar.length} pafta</p></div>
+          <a class="btn y" href="${esc(s.pdf)}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19h14"/></svg>PDF indir</a></div>
+        <div class="sheets">${s.paftalar.map((p, pi) => `<button type="button" class="sheet" data-sh="${si}:${pi}"><div class="im"><img src="${esc(p.k)}" alt="" loading="lazy"></div><b>${esc(p.ad)}</b></button>`).join("")}</div>
+      </section>`).join("")}
+      ${P.guncelleme ? `<p class="muted small">Son güncelleme ${fmtY(pd(P.guncelleme))}. Paftaya dokununca büyük açılır; "Tam boy" ile ayrıntıya yakınlaşabilirsiniz.</p>` : ""}`;
+    el.querySelectorAll("[data-th]").forEach(b => b.onclick = () => { galIdx = +b.dataset.th; renderProje(); });
+    const m = el.querySelector("[data-gal]"); if (m) m.onclick = () => openList(G.map(x => ({ src: x.src, cap: x.ad + (x.not ? " · " + x.not : "") })), galIdx);
+    el.querySelectorAll("[data-sh]").forEach(b => b.onclick = () => { const [si, pi] = b.dataset.sh.split(":").map(Number); const s = S[si]; openList(s.paftalar.map(p => ({ src: p.src, cap: `${s.ad} ${s.rev.split(" ·")[0]} · ${p.ad}` })), pi); });
+  }
+
   // ---------------- ışık kutusu ----------------
   const lb = $("#lb"); let cur = -1;
-  function openLb(f) { const i = photos.findIndex(p => p.f === f); if (i < 0) return; show(i); lb.classList.add("open"); lb.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; $("#lbClose").focus(); }
-  function show(i) { cur = (i + photos.length) % photos.length; const p = photos[cur]; $("#lbImg").src = p.src; $("#lbCap").textContent = `${fmtY(pd(p.date))} · ${p.label || ""} ${p.t}`; }
+  let lbList = null;   // fotoğraf dışı listeler (görseller, paftalar)
+  function openList(list, i) { lbList = list; showL(i); lb.classList.add("open"); lb.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; $("#lbClose").focus(); }
+  function showL(i) { cur = (i + lbList.length) % lbList.length; const x = lbList[cur]; $("#lbImg").src = x.src; $("#lbCap").innerHTML = `${esc(x.cap)} · <a class="open-full" href="${esc(x.src)}" target="_blank" rel="noopener">Tam boy</a>`; }
+  function openLb(f) { lbList = null; const i = photos.findIndex(p => p.f === f); if (i < 0) return; show(i); lb.classList.add("open"); lb.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; $("#lbClose").focus(); }
+  function show(i) { if (lbList) return showL(i); cur = (i + photos.length) % photos.length; const p = photos[cur]; $("#lbImg").src = p.src; $("#lbCap").textContent = `${fmtY(pd(p.date))} · ${p.label || ""} ${p.t}`; }
   function closeLb() { lb.classList.remove("open"); lb.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }
   $("#lbClose").onclick = closeLb; $("#lbPrev").onclick = () => show(cur - 1); $("#lbNext").onclick = () => show(cur + 1);
   lb.addEventListener("click", e => { if (e.target === lb || e.target.classList.contains("img")) closeLb(); });
@@ -708,8 +814,8 @@ footer img{height:22px;width:auto;opacity:.8;margin-bottom:6px}
   document.addEventListener("click", e => { const b = e.target.closest("[data-ph]"); if (b) { openLb(b.dataset.ph); return; } const g = e.target.closest("[data-go]"); if (g) go(g.dataset.go); });
 
   // ---------------- sekmeler ----------------
-  const TABS = ["ozet", "rapor", "program", "ekip", "cekim"];
-  const rendered = {}, R = { ozet: renderOzet, rapor: renderRapor, program: renderProgram, ekip: renderEkip, cekim: renderCekim };
+  const TABS = ["ozet", "rapor", "program", "ekip", "cekim", "revizyon", "proje"];
+  const rendered = {}, R = { ozet: renderOzet, rapor: renderRapor, program: renderProgram, ekip: renderEkip, cekim: renderCekim, revizyon: renderRevizyon, proje: renderProje };
   const ink = $(".tab-ink");
   function moveInk() { const a = document.querySelector('.tab[aria-selected="true"]'); if (!a || !ink) return; ink.style.left = a.offsetLeft + 10 + "px"; ink.style.width = a.offsetWidth - 20 + "px"; }
   function go(t, first) {

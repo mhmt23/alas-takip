@@ -1,4 +1,4 @@
-// pano.js testleri: buildPano/getPano (11 anahtar, tarih biçimi, log sırası, ETag) ve
+// pano.js testleri: buildPano/getPano (13 anahtar, tarih biçimi, log sırası, ETag) ve
 // /api/pano.json rotası (oturum, dataset yetkisi, 304).
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
@@ -49,13 +49,15 @@ async function geciciDizin(t) {
 const SABIT_ZAMAN = new Date('2026-10-08T10:44:00Z'); // Istanbul = UTC+3 → 13:44
 
 describe('buildPano', () => {
-  test('11 anahtar, app.html\'in beklediği sırayla; tarih biçimi ve içerik', async (t) => {
+  test('13 anahtar, app.html\'in beklediği sırayla; tarih biçimi ve içerik', async (t) => {
     const dataDir = await geciciDizin(t);
     await ornekVeriYaz(dataDir);
     const pano = await buildPano('main', { dataDir, now: SABIT_ZAMAN });
 
     assert.deepEqual(Object.keys(pano), PANO_ANAHTARLARI);
-    assert.deepEqual(Object.keys(pano), ['project', 'generated', 'photosGenerated', 'banner', 'tasks', 'days', 'logs', 'video', 'reports', 'trades', 'crewPlan']);
+    assert.deepEqual(Object.keys(pano), ['project', 'generated', 'photosGenerated', 'banner', 'tasks', 'days', 'logs', 'video', 'reports', 'trades', 'crewPlan', 'kararlar', 'projeler']);
+    assert.deepEqual(pano.kararlar, {});   // dosya yoksa boş nesne
+    assert.deepEqual(pano.projeler, {});
     assert.equal(pano.generated, '2026-10-08 13:44');
     assert.match(pano.generated, /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/);
     assert.equal(pano.project.title, 'TEST PROJE');
@@ -86,7 +88,7 @@ describe('buildPano', () => {
     assert.equal(zamanDizgisi(new Date('2026-10-08T21:30:00Z'), 'UTC'), '2026-10-08 21:30');
   });
 
-  test('veri yoksa 11 anahtarlı ama boş döner (hiçbir şey uydurulmaz)', async (t) => {
+  test('veri yoksa 13 anahtarlı ama boş döner (hiçbir şey uydurulmaz)', async (t) => {
     const dataDir = await geciciDizin(t); // dataset dizini bile yok
     const pano = await buildPano('main', { dataDir, now: SABIT_ZAMAN });
     assert.deepEqual(Object.keys(pano), PANO_ANAHTARLARI);
@@ -253,7 +255,7 @@ describe('GET /api/pano.json', () => {
     assert.deepEqual(y.json(), { error: 'giris-gerekli' });
   });
 
-  test('oturumla 200: JSON, no-store, ETag, 11 anahtar, generated bugün', async () => {
+  test('oturumla 200: JSON, no-store, ETag, 13 anahtar, generated bugün', async () => {
     const y = await get('/api/pano.json', adminCerez);
     assert.equal(y.statusCode, 200);
     assert.match(y.headers['content-type'], /^application\/json/);
