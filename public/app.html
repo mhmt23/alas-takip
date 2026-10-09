@@ -69,6 +69,9 @@ a{color:inherit}
 .top .proj{display:flex;flex-direction:column;min-width:0}
 .top .proj b{font:700 22px/1.05 var(--font-cond);letter-spacing:.01em}
 .top .proj span{font-size:13px;color:var(--on-graphite-2)}
+.top .hello{margin-left:auto;font-size:14px;color:var(--on-graphite)}
+.top .hello + .meta{margin-left:18px}
+.top .hello:not([hidden]) + .meta{margin-left:18px}
 .top .meta{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:13px;color:var(--on-graphite-2)}
 .top .meta b{color:var(--on-graphite);font-weight:600}
 .btn-ghost{border:1px solid var(--graphite-2);background:transparent;color:var(--on-graphite);border-radius:999px;padding:6px 14px;font-size:13px;text-decoration:none;cursor:pointer}
@@ -299,6 +302,7 @@ footer img{height:22px;width:auto;opacity:.8;margin-bottom:6px}
   .top .logo{height:30px}
   .top .proj b{font-size:19px}
   .top .meta{display:none}
+  .top .hello{flex-basis:100%;margin:2px 0 0;font-size:13px;color:var(--on-graphite-2)}
   .tabs{position:fixed;left:0;right:0;bottom:0;z-index:50;max-width:none;margin:0;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));background:var(--graphite);gap:0;justify-content:space-around;box-shadow:0 -6px 18px -8px rgba(0,0,0,.4)}
   .tab{flex:1;flex-direction:column;gap:3px;padding:6px 2px;font-size:11.5px;border-radius:10px}
   .tab svg{width:22px;height:22px}
@@ -321,6 +325,7 @@ footer img{height:22px;width:auto;opacity:.8;margin-bottom:6px}
     <img class="logo" src="brand/alas-logo-beyaz.png" alt="Alaş İnşaat" width="94" height="38">
     <span class="sep" aria-hidden="true"></span>
     <div class="proj"><b id="pTitle">338 Ada Kulüp Binası</b><span id="pPlace">Kuşçular, Urla / İzmir</span></div>
+    <span class="hello" id="hello" hidden></span>
     <div class="meta"><span id="pUpd"></span><a id="cikis" class="btn-ghost" href="/cikis" hidden>Çıkış</a></div>
   </div>
   <nav class="tabs" role="tablist" aria-label="Bölümler">
@@ -422,7 +427,15 @@ footer img{height:22px;width:auto;opacity:.8;margin-bottom:6px}
   if (D.project.title) $("#pTitle").textContent = D.project.title.toLocaleLowerCase("tr").replace(/(^|\s)\S/g, m => m.toLocaleUpperCase("tr"));
   if (D.project.place) $("#pPlace").textContent = D.project.place;
   $("#pUpd").innerHTML = gen ? `Güncelleme <b>${fmtK(today)} ${esc(gen.slice(11, 16))}</b>` : "";
-  if (SERVER) $("#cikis").hidden = false;
+  if (SERVER) {
+    $("#cikis").hidden = false;
+    // Hesaba özel karşılama (kullanıcı adı → hitap). Sadece tanımlı hesaplarda görünür.
+    const HITAP = { patron: "Engin Bey" };
+    fetch("/api/me", { credentials: "same-origin", cache: "no-store" }).then(r => r.ok ? r.json() : null).then(me => {
+      const ad = me && HITAP[me.username];
+      if (ad) { const h = $("#hello"); h.textContent = `Hoş geldiniz, ${ad}`; h.hidden = false; }
+    }).catch(() => {});
+  }
 
   // ---------------- ortak parçalar ----------------
   const dual = (p, a) => `<div class="dual" role="img" aria-label="Planlanan yüzde ${pct(p)}, gerçekleşen yüzde ${pct(a)}"><div class="p" style="width:${(p * 100).toFixed(1)}%"></div><div class="a" style="width:${(a * 100).toFixed(1)}%"></div></div><div class="dual-l"><span>Gerçekleşen <b>%${pct(a)}</b></span><span>Planlanan <b>%${pct(p)}</b></span></div>`;
