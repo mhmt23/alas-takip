@@ -618,6 +618,33 @@ describe('sihirli link (patron)', () => {
     }
   });
 
+  test('link listesi token göstermez; iptal edilen link artık çalışmaz, oturumlar istenirse düşer', async () => {
+    const { token } = await linkUret({ label: 'iptal-deneme', maxDevices: 2 });
+    const liste = await t.app.inject({ url: '/api/admin/magic-links', headers: cerezli(adminCerez) });
+    assert.equal(liste.statusCode, 200);
+    assert.ok(!liste.body.includes(token), 'listede token olmamalı');
+    const kayit = liste.json().find((k) => k.label === 'iptal-deneme');
+    assert.match(kayit.id, /^[0-9a-f]{12}$/);
+    assert.equal(kayit.durum, 'acik');
+    // bir cihaz kullanır
+    const ilk = await t.app.inject({ url: `/g/${token}`, headers: { 'user-agent': UA_SAFARI } });
+    assert.equal(ilk.statusCode, 302);
+    const patronCerez = cerezDegeri(ilk);
+    assert.ok(patronCerez);
+    // geçersiz id ve patron yetkisi reddedilir
+    assert.equal((await t.app.inject({ method: 'DELETE', url: '/api/admin/magic-links/xyz', headers: cerezli(adminCerez) })).statusCode, 400);
+    assert.equal((await t.app.inject({ method: 'DELETE', url: `/api/admin/magic-links/${kayit.id}`, headers: cerezli(patronCerez) })).statusCode, 403);
+    // iptal + oturumları düşür
+    const sil = await t.app.inject({ method: 'DELETE', url: `/api/admin/magic-links/${kayit.id}?oturumlar=1`, headers: cerezli(adminCerez) });
+    assert.equal(sil.statusCode, 200, sil.body);
+    assert.equal(sil.json().silinen, 1);
+    assert.equal((await t.app.inject({ method: 'DELETE', url: `/api/admin/magic-links/${kayit.id}`, headers: cerezli(adminCerez) })).statusCode, 404);
+    const tekrar = await t.app.inject({ url: `/g/${token}`, headers: { 'user-agent': UA_SAFARI } });
+    assert.equal(tekrar.statusCode, 410, 'iptal edilen link 410 dönmeli');
+    const me = await t.app.inject({ url: '/api/me', headers: cerezli(patronCerez) });
+    assert.equal(me.statusCode, 401, 'iptal edilen linkle açılan oturum düşmeli');
+  });
+
   test('webview: oturum açmaz, token yakmaz; Safari/Chrome uyarı sayfası + aynı link', async () => {
     const { token } = await linkUret({ label: 'wv', maxDevices: 1 });
     const yanit = await t.app.inject({ url: `/g/${token}`, headers: { 'user-agent': UA_WEBVIEW, host: 'alas.example.com' } });

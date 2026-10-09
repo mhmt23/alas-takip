@@ -63,6 +63,19 @@ export default async function adminRoutes(app, { config, auth, audit, auditTail 
     return { url: `${disKok(config, req)}/g/${token}`, token, expiresAt: new Date(expiresAt).toISOString() };
   });
 
+  app.get('/api/admin/magic-links', { onRequest: sadeceAdmin }, async () => auth.listMagicLinks());
+
+  // id = listedeki 12 haneli kimlik ya da "*" (hepsi). ?oturumlar=1 → bu linkle açılmış oturumlar da düşer.
+  app.delete('/api/admin/magic-links/:id', { onRequest: sadeceAdmin }, async (req, reply) => {
+    const { id } = req.params;
+    if (id !== '*' && !/^[0-9a-f]{12}$/.test(id)) return hata400(reply, 'id-gecersiz', 'id 12 haneli kimlik ya da * olmalı');
+    const oturumlariDusur = req.query?.oturumlar === '1';
+    const silinen = await auth.revokeMagicLink(id, { oturumlariDusur });
+    if (!silinen) return reply.code(404).send({ error: 'link-yok' });
+    await audit(req, 'sihirli-link-iptal', { id, silinen, oturumlariDusur });
+    return { ok: true, silinen };
+  });
+
   // ---- oturumlar
   app.get('/api/admin/sessions', { onRequest: sadeceAdmin }, async (req) => auth.listSessions(req.sid));
 

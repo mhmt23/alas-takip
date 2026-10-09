@@ -2,7 +2,7 @@
 //  - Saf yardımcılar (hash, çerez imzası, süre, webview tespiti) dışa açıktır ve test edilir.
 //  - createAuth(): users.json / sessions.json / tokens.json'u bellekte tutar, değişince atomik yazar.
 // Gizli değerler (şifre, SESSION_SECRET, sihirli link token'ı) ASLA loglanmaz.
-import { scrypt, randomBytes, timingSafeEqual, createHmac } from 'node:crypto';
+import { scrypt, randomBytes, timingSafeEqual, createHmac, createHash } from 'node:crypto';
 import { promises as fsp } from 'node:fs';
 import { promisify } from 'node:util';
 import path from 'node:path';
@@ -470,10 +470,40 @@ export function createAuth({ config, log, audit }) {
     return { sid, label: kayit.label };
   }
 
+  /** Token'ın kimliği: SHA-256 ilk 12 hex. Token'ın kendisi listede asla görünmez. */
+  function tokenKimligi(token) {
+    return createHash('sha256').update(token).digest('hex').slice(0, 12);
+  }
+
+  /** Sihirli linklerin listesi (token'sız): id, etiket, süre, kullanım sayısı. */
+  function listMagicLinks() {
+    const iso = (ms) => (typeof ms === 'number' ? new Date(ms).toISOString() : null);
+    const simdi = Date.now();
+    return [...tokens].map(([token, k]) => ({
+      id: tokenKimligi(token), label: k.label ?? '', createdAt: iso(k.createdAt), expiresAt: iso(k.expiresAt),
+      maxDevices: k.maxDevices, used: k.uses.length,
+      durum: typeof k.expiresAt !== 'number' || k.expiresAt <= simdi ? 'suresi-doldu' : (k.uses.length >= k.maxDevices ? 'dolu' : 'acik'),
+    }));
+  }
+
+  /** Linki iptal eder (id ile). Bu linkle açılmış oturumlar istenirse ayrıca düşürülür. Silinen sayıyı döner. */
+  async function revokeMagicLink(id, { oturumlariDusur = false } = {}) {
+    let silinen = 0;
+    for (const [token, k] of [...tokens]) {
+      if (id === '*' || tokenKimligi(token) === id) {
+        tokens.delete(token);
+        silinen++;
+        if (oturumlariDusur) dropUserSessions(`patron:${String(k.label || 'link').slice(0, 40)}`);
+      }
+    }
+    if (silinen) await yaz.tokens.planla();
+    return silinen;
+  }
+
   return {
     init, close, resolve, verifyLogin,
     listUsers, upsertUser,
     createSession, destroySession, dropUserSessions, listSessions, setCookie, clearCookie,
-    createMagicLink, inspectToken, consumeToken,
+    createMagicLink, inspectToken, consumeToken, listMagicLinks, revokeMagicLink,
   };
 }
