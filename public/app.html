@@ -658,7 +658,8 @@ footer img{height:22px;width:auto;opacity:.8;margin-bottom:6px}
   function renderCekim() {
     const el = $("#cekim");
     if (!days.length) { el.innerHTML = `<div class="sec-h"><h2>Çekimler</h2></div><div class="empty">Drone çekimleri işlendiğinde sabah ve akşam turları burada görünür.</div>`; return; }
-    const cover = d => { const s = d.sessions[d.sessions.length - 1]; const p = s && (s.photos || [])[0]; return p ? { ...p, date: d.date, label: s.label } : null; };
+    // önce/sonra: günün son turundaki karşı açı karesi (yoksa turun ana karesi)
+    const cover = d => { const s = d.sessions[d.sessions.length - 1]; const p = s && (s.karsi || (s.photos || [])[0]); return p ? { ...p, date: d.date, label: s.label } : null; };
     const withPh = days.filter(cover);
     const opts = withPh.map(d => `<option value="${d.date}">${fmtY(pd(d.date))}</option>`).join("");
     el.innerHTML = `
