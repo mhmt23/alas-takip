@@ -4,8 +4,8 @@
  "start_url": "/app.html",
  "scope": "/",
  "display": "standalone",
- "background_color": "#f3f4f6",
- "theme_color": "#2b5d8c",
+ "background_color": "#2B2E32",
+ "theme_color": "#2B2E32",
  "lang": "tr",
  "icons": [
   {

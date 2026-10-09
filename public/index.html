@@ -1,40 +1,44 @@
 <!doctype html>
 <html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#2b5d8c">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#2B2E32">
 <link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon-192.png"><link rel="apple-touch-icon" href="/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Alas Takip">
 <title>Alas Takip</title>
 <link rel="stylesheet" href="/fonts/fonts.css">
 <style>
-:root{--bg:#f3f4f6;--sf:#fff;--line:#d5d9e0;--fg:#15202b;--fg2:#4b5563;--fg3:#7a8494;--acc:#2b5d8c;--crit:#c73a3a}
-@media (prefers-color-scheme:dark){:root{--bg:#12161b;--sf:#1b2129;--line:#2f3844;--fg:#eef1f4;--fg2:#b6bfca;--fg3:#7f8a98;--acc:#6fa3d6;--crit:#e46262;color-scheme:dark}}
+:root{--bg:#ECEDEA;--sf:#fff;--line:#DDDED9;--fg:#24272B;--fg2:#585858;--fg3:#878983;--y:#F0BC00;--g:#2B2E32;--crit:#C43A30}
+@media (prefers-color-scheme:dark){:root{--bg:#16181B;--sf:#202327;--line:#33373D;--fg:#EEF0F1;--fg2:#BABDC1;--fg3:#868B91;--crit:#E86A60;color-scheme:dark}}
 *{box-sizing:border-box}html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 Barlow,"Segoe UI",system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:16px}
-.card{width:100%;max-width:380px;background:var(--sf);border:1px solid var(--line);border-radius:10px;padding:26px 24px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
-.brand{font:700 13px/1 Barlow,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
-h1{font:700 30px/1.05 "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;margin:6px 0 2px}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 Barlow,"Segoe UI",system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:16px}
+.card{width:100%;max-width:400px;background:var(--sf);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 10px 30px -16px rgba(0,0,0,.35)}
+.head{background:var(--g);padding:22px 24px 18px;border-bottom:4px solid var(--y)}
+.head img{height:42px;width:auto;display:block}
+.body{padding:22px 24px 20px}
+h1{font:700 30px/1.05 "Barlow Condensed","Arial Narrow",sans-serif;margin:0 0 2px}
 .sub{color:var(--fg3);font-size:14px;margin-bottom:20px}
 label{display:block;font-size:13px;color:var(--fg2);margin-bottom:4px}
 label + input + label{margin-top:12px}
-input[type=text],input[type=password]{width:100%;font:inherit;font-size:17px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--sf);color:var(--fg)}
-input:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-button{width:100%;margin-top:14px;font:600 16px Barlow,sans-serif;padding:11px;border:0;border-radius:8px;background:var(--acc);color:#fff;cursor:pointer}
+input[type=text],input[type=password]{width:100%;font:inherit;font-size:17px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--sf);color:var(--fg)}
+input:focus-visible,button:focus-visible{outline:2px solid var(--y);outline-offset:2px}
+button{width:100%;margin-top:16px;font:600 16px Barlow,sans-serif;padding:12px;border:0;border-radius:999px;background:var(--y);color:#2B2E32;cursor:pointer}
 button:disabled{opacity:.6;cursor:default}
 .err{color:var(--crit);font-size:14px;min-height:20px;margin-top:10px}
-.foot{color:var(--fg3);font-size:12.5px;margin-top:16px;border-top:1px solid var(--line);padding-top:10px}
+.foot{color:var(--fg3);font-size:12.5px;margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
 </style></head><body>
 <form class="card" id="f" method="post" action="/api/login" autocomplete="on">
-  <div class="brand">Alas Takip</div>
+  <div class="head"><img src="/brand/alas-logo-beyaz.png" alt="Alaş İnşaat" width="104" height="42"></div>
+  <div class="body">
   <h1>338 Ada Kulüp Binası</h1>
   <div class="sub">Şantiye ilerleme ve günlük rapor panosu</div>
   <label for="kul">Kullanıcı adı</label>
   <input type="text" id="kul" name="username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required autofocus>
-  <label for="pw">Giriş şifresi</label>
+  <label for="pw">Şifre</label>
   <input type="password" id="pw" name="password" autocomplete="current-password" required>
   <input type="hidden" id="next" name="next" value="">
-  <button type="submit" id="go">Giriş</button>
+  <button type="submit" id="go">Giriş yap</button>
   <div class="err" id="err" role="alert"></div>
   <div class="foot">Bu cihazda bir kez girmeniz yeterli. Telefonda paylaş menüsünden "Ana Ekrana Ekle" ile uygulama gibi kullanabilirsiniz.</div>
+  </div>
 </form>
 <script>
 const $ = s => document.querySelector(s);
@@ -76,7 +80,7 @@ $("#f").addEventListener("submit", async ev => {
   } catch (e) {
     err.textContent = "Sunucuya ulaşılamadı. Bağlantınızı kontrol edip tekrar deneyin.";
   } finally {
-    if (!gidiyor) { go.disabled = false; go.textContent = "Giriş"; }
+    if (!gidiyor) { go.disabled = false; go.textContent = "Giriş yap"; }
   }
 });
 </script></body></html>
